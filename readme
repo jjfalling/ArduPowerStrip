@@ -7,9 +7,11 @@ This was developed on a Arduino Uno board, an R3 ethernet sheild, and the 1.0.x 
 All interactions are done through telnet. Some debugging is given through the serial port (8N1 9600) such as the ip, etc. 
 
 
+
+
 Here is some of the output from a telnet session:
 
-*
+
 Welcome to APS-rpc1 running ArduPowerStrip 0.1
 Enter command or type HELP...
 
@@ -62,4 +64,3 @@ Status of outlet 1 is: ON
 
 Goodbye...
 
-*
