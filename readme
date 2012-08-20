@@ -4,7 +4,7 @@ ArduPowerStrip
 This was developed on a Arduino Uno board, an R3 ethernet sheild, and the 1.0.x branch of the Arduino IDE.
 
 
-All interactions are done through telnet. Some debugging is given through the serial port (8N1 9600) such as the ip, etc. 
+All interactions are done through telnet. Some debugging output is given through the serial port (8N1 9600) such as the ip, etc. It does not take input from serial at this time. 
 
 
 
