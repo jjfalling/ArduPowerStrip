@@ -1,0 +1,65 @@
+ArduPowerStrip
+==============
+
+This was developed on a Arduino Uno board, an R3 ethernet sheild, and the 1.0.x branch of the Arduino IDE.
+
+
+All interactions are done through telnet. Some debugging is given through the serial port (8N1 9600) such as the ip, etc. 
+
+
+Here is some of the output from a telnet session:
+
+*
+Welcome to APS-rpc1 running ArduPowerStrip 0.1
+Enter command or type HELP...
+
+> help
+
+System Help
+Try help <cmd> for more info
+----------------------
+| Available Commands |
+----------------------
+HELP
+INFO	SHOW	ON
+OFF	
+
+> info
+
+----------------------
+| System Information |
+----------------------
+
+Software: ArduPowerStrip
+Version: 0.1
+IP: 192.168.2.100
+Mask: 255.255.0.0
+Gateway: 192.168.2.1
+MAC: DE:AD:BE:EF:FE:ED
+Hostname: APS-rpc1
+Number of outlets: 2
+Reboot delay (ms): 3000
+
+> off 1
+
+Setting outlet 1 to OFF
+Done. 
+
+> show 1
+
+Status of outlet 1 is: OFF
+
+> on 1
+
+Setting outlet 1 to ON
+Done. 
+
+> show 1
+
+Status of outlet 1 is: ON
+
+> quit
+
+Goodbye...
+
+*
