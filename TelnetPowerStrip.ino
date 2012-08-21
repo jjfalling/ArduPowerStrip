@@ -4,9 +4,12 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  
  Much of this is based off of this: https://github.com/ajfisher/arduino-command-server
  Also where I found the split library
+ 
+ 
+ There is a known bug with the help function, looks like a memory issue. Working on fixing it...
  */
 
-//################## 
+//################## 17
 //User settings
 //################## 
 
@@ -14,11 +17,11 @@ ARDUPOWERSTRIP - JJFALLING ©2012
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] =   { 
-  192,  168,  2,  100 };
+  192,  168,  15, 17 };
 byte gateway[] = { 
-  192,  168,  2, 1 };
+  192,  168,  15, 1 };
 byte subnet[] = { 
-  255, 255, 0, 0 };
+  255, 255, 255, 0 };
 
 //Hostname
 const char hostname[] = "APS-rpc1";
@@ -27,15 +30,18 @@ const char hostname[] = "APS-rpc1";
 //NC is 1, NO is 0.
 const int relayType = 1;    
 
-//What digital pins are your outlets attached to (outlet 1 will be the first listed, 2 the second listed, etc)?
+//What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = {
-  7,8,};
+  7,8};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 const int rebootDelay = 3000;
 
-//Enable serial debug?
+//Enable serial debug? (leave this as true)
 boolean debug = true;
+
+//What pin is connected to the reset pin?
+//const int resetPin = 2;
 
 //################## 
 //End user settings
@@ -55,7 +61,7 @@ Client *ethcl = NULL;
 typedef void (* CommandFuncPtr)(String args); // typedef to the command
 
 struct Command {
-  char code[5]; // the code used to call the command
+  char code[7]; // the code used to call the command
   String help; // the snippet help version
   CommandFuncPtr cmd; // point to the command to be called
 };
@@ -63,8 +69,9 @@ struct Command {
 
 String command;
 
-#define MAX_COMMANDS 10
-Command com[MAX_COMMANDS];
+#define MAX_COMMANDS 7
+Command com[MAX_COMMANDS]={
+};
 
 //Don't know why, but for some reason I have to divide by 2 to get the real number
 const int numOfOutlets = (sizeof(outlets))/2;
@@ -79,15 +86,21 @@ void setup() {
 
   Serial.begin(9600);
   client = &Serial;
-  if (debug) Serial.println("Booting...\nStarted serial debug");
+  if (debug) Serial.println("Booting...\nStarted serial interface");
 
   //set the pin modes
   int x;
-  for (x=0; x < numOfOutlets -1; x++) {
+  for (x=0; x < numOfOutlets; x++) {
     int curr_pin=outlets[x];
     pinMode(curr_pin, OUTPUT);
+//    if (debug) Serial.print("Outlet ");
+//    if (debug) Serial.print(x +1);
+//    if (debug) Serial.print(" is pin ");
+//    if (debug) Serial.println(curr_pin);
 
   }
+
+  //pinMode(resetPin, OUTPUT);
 
   client = &Serial;
   if (debug) Serial.println("Starting network");
@@ -107,22 +120,23 @@ void setup() {
   client->print(ip[3]);
   client->println(" to use this device.");
 
-  command = "";
+
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help    };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info  };
+    "INFO", "Shows system information", command_info    };
   com[2]=(Command){
-    "SHOW", "Shows the status of a outlet", command_status  };
+    "SHOW", "Shows the status of a outlet", command_status    };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on  };
+    "ON", "Sets an outlet to on", command_on    };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off  };
+    "OFF", "Sets an outlet to off", command_off    };
   com[5]=(Command){
-    "REBT", "Reboots an outlet ", command_reboot  };
-  //com[6]=(Command){"NAME", "To be impimented... Maybe?", command_name};
-  com[7]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit  };
+    "REBOOT", "Reboots an outlet", command_reboot    };
+  com[6]=(Command){
+    "QUIT", "Quits this session gracefully", command_quit    };
+  //com[7]=(Command){"RESET", "Resets (reboots) this device", command_reset};
+  //com[8]=(Command){"NAME", "To be impimented... Maybe?", command_name};
 
 
 }
@@ -255,7 +269,7 @@ void command_status(String args) {
   realPin = outlets[realPin];
 
   if (pin > numOfOutlets || pin < 0) {
-    client->println("ERR: Invalid outlet specified");
+    client->println("ERR: That outlet does not exist");
     print_prompt();
     return;
   }
@@ -510,7 +524,6 @@ void command_help(String args) {
     // we attempt to see if there is a command we should spit out instead.
     cmd_index = command_item(args);
     if (cmd_index < 0) client->println("ERR: Syntax error please use a command");
-    print_prompt();
   } 
   else {
     cmd_index = -1;
@@ -538,7 +551,7 @@ void command_help(String args) {
     print_prompt();
   } 
   else {
-    //  client->println("HELP");
+    // client->println("HELP");
     client->println();
     client->print(com[cmd_index].code);
     client->print(": ");
@@ -633,4 +646,21 @@ void command_quit(String args) {
   client->println();
   ethcl->stop();
 }
+
+/* 
+ 
+ //user wanted to reset controller
+ void command_reset(String args) {
+ client->println("");
+ client->println("Resetting controler.");
+ client->println("Goodbye...");
+ client->println();
+ ethcl->stop();
+ 
+ digitalWrite(resetPin, LOW);
+ 
+ 
+ }
+ */
+
 
