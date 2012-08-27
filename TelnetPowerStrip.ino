@@ -186,7 +186,7 @@ void setup() {
   com[4]=(Command){"OFF", "Sets an outlet to off", command_off      };
   com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot      };
   com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit      };
-  com[7]=(Command){"RESET", "Preform a software reset on this device", command_reset  };
+  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
 
@@ -752,5 +752,6 @@ int memoryTest() {
   free(byteArray); // also free memory after the function finishes
   return byteCounter; // send back the highest number of bytes successfully allocated
 }
+
 
 
