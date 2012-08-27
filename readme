@@ -8,7 +8,7 @@ All interactions are done through telnet. Some debugging output is given through
 
 A section with user settings should be changed to fit your needs before flashing.
 
-statusLED (user specified) is a pin that should be attached to a led on the chassis of the power strip. You could also attach it to the main circuit for your office or data center lighting to blink the lights whenever someone is using the power strip ;-)
+statusLED (user specified) is a pin that should be attached to a led on the chassis of the power strip. The led will turn on when the device is ready and blink when there is an active telnet session. You could also attach it to the main circuit for your office or data center lighting to blink the lights whenever someone is using the power strip ;-)
 
 
 Here is some of the output from a telnet session:
