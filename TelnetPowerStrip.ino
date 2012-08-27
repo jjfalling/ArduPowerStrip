@@ -36,6 +36,9 @@ const int outlets[] = { 7,8};
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 const int rebootDelay = 3000;
 
+//What pin is the statusLED connected to?
+const int statusLED =  2;
+
 //Enable serial debug? 
 boolean debug = true;
 
@@ -52,6 +55,10 @@ boolean debug = true;
 #include <Flash.h>
 #include <avr/wdt.h>
 
+//program name and version
+#define _NAME "ArduPowerStrip"
+#define _VERSION "0.2"
+
 //disable watchdog, this is needed on newer chips to prevent a reboot loop. However I can't test this...
 void wdt_init(void)
 {
@@ -61,9 +68,11 @@ void wdt_init(void)
   return;
 }
 
-//program name and version
-#define _NAME "ArduPowerStrip"
-#define _VERSION "0.1"
+
+//status led
+int ledState = LOW;             // ledState used to set the LED
+long previousMillis = 0;        // will store last time LED was updated
+long interval = 1000;           // interval at which to blink (milliseconds)
 
 Print *client = &Serial;
 Client *ethcl = NULL;
@@ -142,8 +151,8 @@ FLASH_STRING(exit1,"Closing connection. Goodbye...\n");
 //end of global section
 //########################## 
 
-void setup() {
-
+void setup() { 
+  
   Serial.begin(9600);
   client = &Serial;
   if (debug) Serial << boot1;
@@ -189,6 +198,7 @@ void setup() {
   com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
+  pinMode(statusLED, OUTPUT);
 
 }
 
@@ -196,8 +206,11 @@ void setup() {
 
 
 void loop() {
-
+  
   eclient = server.available();
+      
+  //turn staus led on since the device is now operational
+  digitalWrite(statusLED, HIGH);
 
   if (eclient) {
     if (debug) Serial.println("User connected");
@@ -226,6 +239,7 @@ void loop() {
 
 
     while(eclient.connected()) {
+      
       if (eclient.available()){
         char ch = eclient.read();
         //Serial.println(ch, DEC);
@@ -243,6 +257,22 @@ void loop() {
           command += String(ch);
         }
       }
+   
+     //Blink status led while there is an active telnet session
+     //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
+     unsigned long currentMillis = millis();
+     if(currentMillis - previousMillis > interval) {
+         // save the last time you blinked the LED 
+         previousMillis = currentMillis;   
+         // if the LED is off turn it on and vice-versa:
+         if (ledState == LOW)
+           ledState = HIGH;
+         else
+           ledState = LOW;
+         // set the LED with the ledState of the variable:
+         digitalWrite(statusLED, ledState);
+      }
+      
     }
 
     if (!eclient.connected() && newClient) {
@@ -250,6 +280,7 @@ void loop() {
       newClient = false;
       if (debug) Serial.println("User disconnected");
     }
+    
   }
 
 }
@@ -544,6 +575,7 @@ void set_outlet(int pin, int power_req) {
     break;
 
     //reboot
+    //FIX: change from delay to something else so other tasks dont pause (such as status light)
   case 3:
     {
       if (relayType == 0) {
@@ -735,7 +767,7 @@ void command_reset(String args) {
 
 }
 
-//This bit from http://www.faludi.com/itp/arduino/Arduino_Available_RAM_Test.pde:
+//This bit from http://www.faludi.com/itp/arduino/Arduino_Available_RAM_Test.pde :
 // this function will return the number of bytes currently free in RAM
 int memoryTest() {
   int byteCounter = 0; // initialize a counter
@@ -752,6 +784,5 @@ int memoryTest() {
   free(byteArray); // also free memory after the function finishes
   return byteCounter; // send back the highest number of bytes successfully allocated
 }
-
 
 
