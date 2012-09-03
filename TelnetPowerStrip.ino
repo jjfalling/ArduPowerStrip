@@ -11,6 +11,11 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  
  There are a few quirks and random issues. They might be caused by a memory leak, not sure...
  
+ TODO:
+  -enable telent session timeout
+  -on/off/reboot all
+  -change network/hostname over telnet? move said settings to flash.
+ 
  */
 
 //################## 
@@ -72,7 +77,7 @@ void wdt_init(void)
 //status led
 int ledState = LOW;             // ledState used to set the LED
 long previousMillis = 0;        // will store last time LED was updated
-long interval = 1000;           // interval at which to blink (milliseconds)
+long interval = 700;           // interval at which to blink (milliseconds)
 
 Print *client = &Serial;
 Client *ethcl = NULL;
@@ -352,7 +357,7 @@ void command_status(String args) {
     return;
   }
 
-  if (pin > numOfOutlets || pin < 0) {
+  if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     return;
@@ -362,7 +367,7 @@ void command_status(String args) {
   realPin = outlets[realPin];
   
 
-  if (pin > numOfOutlets || pin < 0) {
+  if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     return;
@@ -445,7 +450,7 @@ void command_on(String args) {
     return;
   }
 
-  if (pin > numOfOutlets || pin < 0) {
+  if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     return;
@@ -482,10 +487,10 @@ void command_off(String args) {
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
-    return;
+    return;  
   }
 
-  if (pin > numOfOutlets || pin < 0) {
+  if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     return;
@@ -523,7 +528,7 @@ void command_reboot(String args) {
     return;
   }
 
-  if (pin > numOfOutlets || pin < 0) {
+  if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     return;
@@ -784,5 +789,6 @@ int memoryTest() {
   free(byteArray); // also free memory after the function finishes
   return byteCounter; // send back the highest number of bytes successfully allocated
 }
+
 
 
