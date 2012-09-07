@@ -195,7 +195,7 @@ void setup() {
 
   com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help      };
   com[1]=(Command){"INFO", "Shows system information", command_info      };
-  com[2]=(Command){"SHOW", "Shows the status of a outlet", command_status      };
+  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status      };
   com[3]=(Command){"ON", "Sets an outlet to on", command_on      };
   com[4]=(Command){"OFF", "Sets an outlet to off", command_off      };
   com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot      };
