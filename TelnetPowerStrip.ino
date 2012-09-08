@@ -276,7 +276,7 @@ void setup() {
 
   com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help};
   com[1]=(Command){"INFO", "Shows system information", command_info};
-  com[2]=(Command){]"STATUS", "Shows the status of a outlet", command_status};
+  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status};
   com[3]=(Command){"ON", "Sets an outlet to on", command_on};
   com[4]=(Command){"OFF", "Sets an outlet to off", command_off};
   com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot};
@@ -298,7 +298,7 @@ void setup() {
   delay(5);                            // Required delay  
   lcdSerial.write(17);    // Turn backlight on
 
-  /*
+  
   //start up scale chirp thing
    lcdSerial.write(216);                //scale
    lcdSerial.write(208);                //note
@@ -309,7 +309,7 @@ void setup() {
    lcdSerial.write(227);                // play e
    lcdSerial.write(228);                // play f
    lcdSerial.write(230);                // play g
-   */
+   
 
   //print name and version to lcd
   lcdSerial.write(128);      // line 0 pos 0
