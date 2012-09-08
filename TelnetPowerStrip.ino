@@ -8,25 +8,34 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  Also where I found the split library
  Flash library found here: http://arduiniana.org/libraries/flash/
  
- 
- There are a few quirks and random issues. They might be caused by a memory leak, not sure...
- 
  TODO:
-  -enable telent session timeout
-  -on/off/reboot all
-  -change network/hostname over telnet? move said settings to flash.
+ -enable telent session timeout
+ -allow only one session
+ -on/off/reboot/status all
+ -change network/hostname over telnet? move said settings to flash. 
+ -remove debug option for serial
+ -varrious items commented as fix
+ 
+ -add amp/volt reporting (with option of using lcd display) - v3
+ -add temp/humid sensing (int and ext sensors) - v3
  
  */
 
 //################## 
 //User settings
 //################## 
+//Keep in mind, standard ethernet sheild reserves pins 4,10,11,12,13
+//Also, you can use analog pins instead of dig pins by using A[pin number]. I have only tested this with relays.
 
 //Network info
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] =   { 192,  168,  15, 17 };
-byte gateway[] = { 192,  168,  15, 1 };
-byte subnet[] = { 255, 255, 255, 0 };
+byte mac[] = { 
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte ip[] =   { 
+  192,  168,  15, 17 };
+byte gateway[] = { 
+  192,  168,  15, 1 };
+byte subnet[] = { 
+  255, 255, 255, 0 };
 
 //Hostname
 const char hostname[] = "APS-rpc1";
@@ -36,17 +45,41 @@ const char hostname[] = "APS-rpc1";
 const int relayType = 1;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
-const int outlets[] = { 7,8};
+const int outlets[] = { 
+  A0,A1,A2,A3};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
-const int rebootDelay = 3000;
+const int rebootDelay = 3000; 
+
+//How long before the telnet session times out(in milliseconds)?
+const long telnetTimeout = 300000;
 
 //What pin is the statusLED connected to?
 const int statusLED =  2;
 
-//Enable serial debug? 
-boolean debug = true;
+// What pin is the lcd backlight button connected to?
+const int  buttonPin = 3;
 
+//What pin is the lcd serial pin connected to?
+const int lcdTxPin = 5;
+
+//How long should the lcd be on before it turns its self off (in ms) [this is to save power]? 
+const long lcdTimeout = 360000;
+
+//What pin is the internal humid/temp (dht11) sensor on?
+#define intDHT11 7
+
+//What pin is the external humid/temp 1 (dht11) sensor on?
+#define ext1DHT11 8
+
+//What pin is the external humid/temp 2 (dht11) sensor on?
+#define ext2DHT11 9
+
+//Do you want fahrenheit or celsius? True is f, false if c
+boolean tempF = true;
+
+//FIX rm this: Enable serial debug? 
+boolean debug = true;
 
 //################## 
 //End user settings
@@ -59,10 +92,16 @@ boolean debug = true;
 #include <split.h>
 #include <Flash.h>
 #include <avr/wdt.h>
+#include <SoftwareSerial.h>
+#include <dht11.h>
+
+dht11 DHT11;
+
+SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
 
 //program name and version
 #define _NAME "ArduPowerStrip"
-#define _VERSION "0.2"
+#define _VERSION "0.3"
 
 //disable watchdog, this is needed on newer chips to prevent a reboot loop. However I can't test this...
 void wdt_init(void)
@@ -79,6 +118,13 @@ int ledState = LOW;             // ledState used to set the LED
 long previousMillis = 0;        // will store last time LED was updated
 long interval = 700;           // interval at which to blink (milliseconds)
 
+
+int buttonState = 0;         // current state of the button
+long previousMillisLCD = 0;
+boolean backlight = true;     // variable for reading the pin status
+
+int chk;
+
 Print *client = &Serial;
 Client *ethcl = NULL;
 
@@ -90,8 +136,23 @@ struct Command {
   CommandFuncPtr cmd; // point to the command to be called
 };
 
-
 String command;
+
+//used to store time since last command in telnet
+unsigned long telnetTime=0; 
+
+//array for sensors (even is humid, odd is temp)
+float sensorData[6];
+
+//used for figuring out where we shove data into the array.
+int startNum = 0;
+
+//the sensors need a delay between reading, so we need a timer for them.
+long previousMillisSensor = 0;
+int sensorCounter = 0;
+
+long previousMillisLCDT = 0;
+int lcdCounter = 0;
 
 //FIX: Need to make this automatic:
 #define MAX_COMMANDS 8
@@ -104,6 +165,8 @@ const int numOfOutlets = (sizeof(outlets))/2;
 // start server on port 23 (telnet)
 EthernetServer server(23);
 boolean newClient = false;
+
+byte firstClientIP[4];
 
 //init the ethernet library here so we can use it outside of the main loop.
 EthernetClient eclient;
@@ -123,7 +186,7 @@ FLASH_STRING(process1,"ERR: Unknown command, try HELP?\n");
 FLASH_STRING(error_1,"ERR: Outlet number not supplied\n");
 FLASH_STRING(error_2,"ERR: Outlet number too high or too many arguments\n");
 FLASH_STRING(error_3,"ERR: That outlet does not exist\n");
-FLASH_STRING(error_4,"ERR: invalid power_req, this should not happen...\n");
+FLASH_STRING(error_4,"ERR: invalid power_req, this is an internal error that should not happen...\n");
 FLASH_STRING(error_5,"ERR: Syntax error please use a valid command\n");
 FLASH_STRING(set1,"Setting outlet ");
 FLASH_STRING(set2," to ");
@@ -150,14 +213,32 @@ FLASH_STRING(info9,":");
 FLASH_STRING(info10,"Hostname: ");
 FLASH_STRING(info11,"Number of outlets: ");
 FLASH_STRING(info12,"Reboot delay (ms): ");
+FLASH_STRING(info13,"Volts: ");
+FLASH_STRING(info14,"Amps: ");
+FLASH_STRING(info15,"Int humid/temp: ");
+FLASH_STRING(info16,"Ext1 humid/temp: ");
+FLASH_STRING(info17,"Ext2 humid/temp: ");
 FLASH_STRING(reset1,"Resetting controler.\n");
 FLASH_STRING(exit1,"Closing connection. Goodbye...\n");
+FLASH_STRING(connect1,"\n\nAnother user is already connected.");
+FLASH_STRING(connect2,"\nOnly one user can connect at a time.\nClosing connection. Goodbye...\n\n");
+FLASH_STRING(connect3,"Second user tried to connect");
+FLASH_STRING(lcd1,"Volts:     ");
+FLASH_STRING(lcd2,"Amps:       ");
+FLASH_STRING(lcd3,"Humid1:   ");
+FLASH_STRING(lcd4,"Humid2:   ");
+FLASH_STRING(lcd5,"Humid3:   ");
+FLASH_STRING(lcd6,"Temp1:    ");
+FLASH_STRING(lcd7,"Temp2:    ");
+FLASH_STRING(lcd8,"Temp3:    ");
+FLASH_STRING(lcd9,"     Uptime:");
+
 
 //end of global section
 //########################## 
 
 void setup() { 
-  
+
   Serial.begin(9600);
   client = &Serial;
   if (debug) Serial << boot1;
@@ -193,32 +274,72 @@ void setup() {
   Serial << boot5;
 
 
-  com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help      };
-  com[1]=(Command){"INFO", "Shows system information", command_info      };
-  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status      };
-  com[3]=(Command){"ON", "Sets an outlet to on", command_on      };
-  com[4]=(Command){"OFF", "Sets an outlet to off", command_off      };
-  com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot      };
-  com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit      };
-  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
+  com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help};
+  com[1]=(Command){"INFO", "Shows system information", command_info};
+  com[2]=(Command){]"STATUS", "Shows the status of a outlet", command_status};
+  com[3]=(Command){"ON", "Sets an outlet to on", command_on};
+  com[4]=(Command){"OFF", "Sets an outlet to off", command_off};
+  com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot};
+  com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit};
+  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
+
+  // initialize the button pin as a input:
+  pinMode(buttonPin, INPUT);
+  pinMode(lcdTxPin, OUTPUT);
+  digitalWrite(lcdTxPin, HIGH);  //parallax uses this in their example, so I assume its required...
+
+  lcdSerial.begin(19200);
+  delay(100);
+  lcdSerial.write(22);                 // Turn backlight on
+  lcdSerial.write(12);                 // Clear    
+  delay(5);                            // Required delay  
+  lcdSerial.write(17);    // Turn backlight on
+
+  /*
+  //start up scale chirp thing
+   lcdSerial.write(216);                //scale
+   lcdSerial.write(208);                //note
+   lcdSerial.write(220);                // play a
+   lcdSerial.write(222);                // play b
+   lcdSerial.write(223);                // play c
+   lcdSerial.write(225);                // play d
+   lcdSerial.write(227);                // play e
+   lcdSerial.write(228);                // play f
+   lcdSerial.write(230);                // play g
+   */
+
+  //print name and version to lcd
+  lcdSerial.write(128);      // line 0 pos 0
+  lcdSerial.write(" ");
+  lcdSerial.write(_NAME); 
+  lcdSerial.write(148);      // line 1 pos 0
+  lcdSerial.write("       "); //as the version num changes, the padding may need adjusting
+  lcdSerial.write(_VERSION); 
+
 
 }
 
 
 
-
 void loop() {
-  
+
   eclient = server.available();
-      
+
   //turn staus led on since the device is now operational
   digitalWrite(statusLED, HIGH);
 
-  if (eclient) {
+  if (eclient && !newClient) {
     if (debug) Serial.println("User connected");
+
+    newClient = true;
+
+    //FIX: get client ip so the multiple user error message will say who is logged in
+    //get client's ip
+    //firstClientIP = eclient.remoteIP()
+
     client = &eclient;
     ethcl = &eclient; // set the global to use later
     client->println();
@@ -233,18 +354,11 @@ void loop() {
     eclient << main3;  
     print_prompt();
 
-    newClient = true;
     eclient.flush();
-
-  // run the memory test function and print the results to the serial port
-  int result = memoryTest();
-  
-  Serial.print("Bytes free ");
-  Serial.println(result,DEC);
 
 
     while(eclient.connected()) {
-      
+
       if (eclient.available()){
         char ch = eclient.read();
         //Serial.println(ch, DEC);
@@ -262,34 +376,64 @@ void loop() {
           command += String(ch);
         }
       }
-   
-     //Blink status led while there is an active telnet session
-     //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
-     unsigned long currentMillis = millis();
-     if(currentMillis - previousMillis > interval) {
-         // save the last time you blinked the LED 
-         previousMillis = currentMillis;   
-         // if the LED is off turn it on and vice-versa:
-         if (ledState == LOW)
-           ledState = HIGH;
-         else
-           ledState = LOW;
-         // set the LED with the ledState of the variable:
-         digitalWrite(statusLED, ledState);
+
+      //Blink status led while there is an active telnet session
+      //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
+      unsigned long currentMillis = millis();
+      if(currentMillis - previousMillis > interval) {
+        // save the last time you blinked the LED 
+        previousMillis = currentMillis;   
+        // if the LED is off turn it on and vice-versa:
+        if (ledState == LOW)
+          ledState = HIGH;
+        else
+          ledState = LOW;
+        // set the LED with the ledState of the variable:
+        digitalWrite(statusLED, ledState);
       }
-      
+
+
+      //following functions are so the backlight and sensors continue to work while a session is active
+      //control lcd backlight
+      controlLCDBacklight();
+      //update sensors
+      updateSensors();
+      //write data to lcd
+      writeLCD();
+
     }
 
     if (!eclient.connected() && newClient) {
       eclient.stop();
       newClient = false;
       if (debug) Serial.println("User disconnected");
+
     }
-    
+
+  } 
+
+  else if (eclient) {
+
+    Serial <<  connect3;    
+    eclient << connect1;
+    // eclient << firstClientIP;
+    eclient << connect2;
+    client->println();
+    eclient.stop();
+
   }
 
-}
 
+  //control lcd backlight
+  controlLCDBacklight();
+
+  //update sensors
+  updateSensors();
+
+  //write data to lcd
+  writeLCD();
+
+}
 
 
 
@@ -345,7 +489,7 @@ void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
-  
+
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
@@ -362,10 +506,10 @@ void command_status(String args) {
     print_prompt();
     return;
   }
-  
+
   int realPin = pin -1;
   realPin = outlets[realPin];
-  
+
 
   if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
@@ -434,11 +578,11 @@ void command_status(String args) {
 }
 
 void command_on(String args) {
-  
+
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
-  
+
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
@@ -455,7 +599,7 @@ void command_on(String args) {
     print_prompt();
     return;
   }
-  
+
   int realPin = pin -1;
   realPin = outlets[realPin];
 
@@ -478,7 +622,7 @@ void command_off(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
-  
+
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
@@ -495,11 +639,11 @@ void command_off(String args) {
     print_prompt();
     return;
   }
-  
+
   int realPin = pin -1;
   realPin = outlets[realPin];
-  
-  
+
+
   client->println();
   eclient << set1;
   client->print(pin);
@@ -516,7 +660,7 @@ void command_reboot(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
-  
+
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
@@ -533,7 +677,7 @@ void command_reboot(String args) {
     print_prompt();
     return;
   }
-  
+
   int realPin = pin -1;
   realPin = outlets[realPin];
 
@@ -735,6 +879,28 @@ void command_info(String args) {
   eclient << info12;
   client->println(rebootDelay);
 
+  //volt sensor
+  eclient << info13;
+  client->println();
+
+  //amp sensor
+  eclient << info14;
+  client->println();
+
+  //humid/temp sensors
+  eclient << info15;
+  client->print(sensorData[0]);
+  client->print(" | " );
+  client->println(sensorData[1]);
+  eclient << info16;
+  client->print(sensorData[2]);
+  client->print(" | " );
+  client->println(sensorData[3]);
+  eclient << info17;
+  client->print(sensorData[4]);
+  client->print(" | " );
+  client->println(sensorData[5]);
+
   //show free mem
   eclient << info3;
   int result = memoryTest();
@@ -763,6 +929,7 @@ void command_reset(String args) {
   Serial << reset1;
   eclient << exit1;
   client->println();
+  newClient=false;
   ethcl->stop();
 
   wdt_enable(WDTO_30MS);
@@ -789,6 +956,283 @@ int memoryTest() {
   free(byteArray); // also free memory after the function finishes
   return byteCounter; // send back the highest number of bytes successfully allocated
 }
+
+
+void controlLCDBacklight() {
+
+
+  // read the current state of the button
+  buttonState = digitalRead(buttonPin);
+
+  // if the button was pushed and the backlight is off, turn the light on
+  if (buttonState == HIGH && backlight == false) {
+    backlight = 1;
+    lcdSerial.write(17);
+
+    //keep screen from flickering 
+    while (buttonState == HIGH){
+      buttonState = digitalRead(buttonPin);
+    }
+  } 
+
+  // if the button was pushed and the backlight is on, turn the light off
+  else if (buttonState == HIGH && backlight == true) {
+    backlight = false;
+    lcdSerial.write(18);
+
+    //keep screen from flickering 
+    while (buttonState == HIGH){
+      buttonState = digitalRead(buttonPin);
+    }
+  }
+
+  //Check if backlight is on and if the timeout has been reached. 
+  if(backlight == true){
+    unsigned long currentMillis = millis();
+    if(currentMillis - previousMillisLCD > lcdTimeout) {
+      lcdSerial.write(18);
+      backlight = false;
+    }
+  }
+
+
+  if(backlight == false){
+    previousMillisLCD = millis();
+  }  
+
+}
+
+
+void writeLCD() {
+  //here we can have a few different screens for the lcd
+
+  //need to use dtostrf to conv float to char. define buffer for said function.
+  static char dtostrfbuffer1[2];
+
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisLCDT > 5000) {
+
+    //display volt/amp
+    if (lcdCounter == 0 ) {
+
+
+      //FIX: make real data go to the lcd:
+      lcdSerial.write(12);                 // Clear    
+      delay(5);                            // Required delay
+      lcdSerial.write(128);      // line 0 pos 0
+      lcdSerial << lcd1;
+      lcdSerial.print("000.0"); 
+      lcdSerial.write(148);      // line 1 pos 0
+      lcdSerial << lcd2;  
+      lcdSerial.print("00.0");
+
+
+      lcdCounter++;
+      previousMillisLCDT = millis();
+
+    }
+
+    //display sensor 1
+    else if (lcdCounter == 1 ) {
+
+      lcdSerial.write(12);       // Clear    
+      delay(5);                  // Required delay
+      lcdSerial.write(128);      // line 0 pos 0
+      lcdSerial << lcd3;
+      lcdSerial.write(dtostrf(sensorData[0],5,2,dtostrfbuffer1));
+      lcdSerial.write(148);      // line 1 pos 0
+      lcdSerial << lcd6;
+      lcdSerial.write(dtostrf(sensorData[1],5,2,dtostrfbuffer1));
+
+      lcdCounter++;
+      previousMillisLCDT = millis();
+
+    }
+
+    //display sensor 2
+    else if (lcdCounter == 2 ) {
+
+      lcdSerial.write(12);       // Clear    
+      delay(5);                  // Required delay
+      lcdSerial.write(128);      // line 0 pos 0
+      lcdSerial << lcd4;
+      lcdSerial.write(dtostrf(sensorData[2],5,2,dtostrfbuffer1));
+      lcdSerial.write(148);      // line 1 pos 0
+      lcdSerial << lcd7;
+      lcdSerial.write(dtostrf(sensorData[3],5,2,dtostrfbuffer1));
+
+      lcdCounter++;
+      previousMillisLCDT = millis();
+
+    }
+
+    //display sensor 3
+    else if (lcdCounter == 3 ) {
+
+      lcdSerial.write(12);       // Clear    
+      delay(5);                  // Required delay
+      lcdSerial.write(128);      // line 0 pos 0
+      lcdSerial << lcd5;
+      lcdSerial.write(dtostrf(sensorData[4],5,2,dtostrfbuffer1));
+      lcdSerial.write(148);      // line 1 pos 0
+      lcdSerial << lcd8;
+      lcdSerial.write(dtostrf(sensorData[5],5,2,dtostrfbuffer1));
+
+      lcdCounter++;
+      previousMillisLCDT = millis();
+
+    }
+
+    else if (lcdCounter == 4 ) {
+
+      lcdSerial.write(12);       // Clear    
+      delay(5);                  // Required delay    
+      lcdSerial.write(128);      // line 0 pos 0
+      lcdSerial << lcd9; 
+      lcdSerial.write(148);      // line 1 pos 0
+      
+      //commented out due to lack of memory
+/*
+      //following bit from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1294011483
+      int days=0;
+      long hours=0;
+      long mins=0;
+      long secs=0;
+      secs = currentMillis/1000; //convect milliseconds to seconds
+      mins=secs/60; //convert seconds to minutes
+      hours=mins/60; //convert minutes to hours
+      days=hours/24; //convert hours to days
+      secs=secs-(mins*60); //subtract the coverted seconds to minutes in order to display 59 secs max
+      mins=mins-(hours*60); //subtract the coverted minutes to hours in order to display 59 minutes max
+      hours=hours-(days*24); //subtract the coverted hours to days in order to display 23 hours max
+
+      lcdSerial.write(dtostrf(days,2,0,dtostrfbuffer1)); //max uptime is about 50 days, so dont do more then 2 chars
+      lcdSerial.write("Days ");
+
+      lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
+      lcdSerial.write(":");
+      lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
+      lcdSerial.write(":");
+      lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
+
+*/
+      lcdCounter=0;
+      previousMillisLCDT = millis();
+
+    }
+
+  }
+}
+
+
+
+
+void updateSensors() {
+
+
+  //there seems to be a need to have a delay between polling different sensor. I have had issues with other projects 
+  // and had to use a delay to fix it. 
+
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillisSensor > 2000) {
+
+    if (sensorCounter == 0 ) {
+      checkDHT11(1);
+      sensorCounter++;
+      previousMillisSensor = millis();
+
+    }
+
+    else if (sensorCounter == 1 ) {
+      checkDHT11(2);
+      sensorCounter++;
+      previousMillisSensor = millis();
+
+    }
+
+    else if (sensorCounter == 2 ) {
+      checkDHT11(3);
+      sensorCounter=0;
+      previousMillisSensor = millis();
+
+    }
+
+  }
+
+
+
+}
+
+
+//check requested sensor
+int checkDHT11(int sensorNumber) {
+
+  //figure out which sensor to poll
+  switch (sensorNumber)
+  {
+  case 1:
+    {
+      chk = DHT11.read(intDHT11);
+      startNum = 0;
+      break;
+    }
+
+
+  case 2:
+    {
+      chk = DHT11.read(ext1DHT11);
+      startNum = 2;
+      break;
+    }
+
+  case 3:
+    {
+      chk = DHT11.read(ext2DHT11);
+      startNum = 4;
+      break;
+    }
+
+  }
+
+  int secondNum = startNum + 1;
+
+  //check if we can read the sensor 
+  switch (chk)
+  {
+    //can read the sensor, put valid data into vars
+  case 0:
+    { 
+
+      //get the humidiy
+      sensorData[startNum] = DHT11.humidity;
+
+      //if user wanted f instead of c, convert
+      if (tempF == true){
+        float tempf = DHT11.temperature;
+        sensorData[secondNum] = 1.8 * tempf + 32;
+      }
+
+      //otherwise dont convert
+      else {
+        sensorData[secondNum] = DHT11.temperature; 
+      }
+      break;
+
+    }
+
+    //invalid data. put impossible numbers into vars
+  default: 
+    {
+      sensorData[startNum] = 999.99;
+      sensorData[secondNum] = 999.99;
+      break;
+    }
+  }
+
+}
+
+
+
 
 
 
