@@ -248,7 +248,7 @@ void setup() {
   for (x=0; x < numOfOutlets; x++) {
     int curr_pin=outlets[x];
     pinMode(curr_pin, OUTPUT);
-    digitalWrite(curr_pin, HIGH);
+    //digitalWrite(curr_pin, HIGH);
 
     if (debug) Serial << boot2;
     if (debug) Serial.print(x +1);
