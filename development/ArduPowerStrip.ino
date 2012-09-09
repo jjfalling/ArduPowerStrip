@@ -43,7 +43,7 @@ const char hostname[] = "APS-rpc1";
 //You need to define the type of relay you are using or how you have it wired.  Also some relays are off when set to low while others are on while set to low.
 //To try and make this as simple as possible, lets just use the following settings system-wide:
 //NC is 1 (off=pin low), NO is 0 (off=pin high).
-const int relayType = 0;    
+const int relayType = 1;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = { 
