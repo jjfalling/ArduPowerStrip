@@ -14,7 +14,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -on/off/reboot/status all
  -change network/hostname over telnet? move said settings to flash. 
  -remove debug option for serial
- -varrious items commented as fix
+ -various items commented as fix
  
  -add amp/volt reporting (with option of using lcd display) - v3
  -add temp/humid sensing (int and ext sensors) - v3
@@ -24,7 +24,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
 //################## 
 //User settings
 //################## 
-//Keep in mind, standard ethernet sheild reserves pins 4,10,11,12,13
+//Keep in mind, standard ethernet shield reserves pins 4,10,11,12,13
 //Also, you can use analog pins instead of dig pins by using A[pin number]. I have only tested this with relays.
 
 //Network info
@@ -218,7 +218,7 @@ FLASH_STRING(info14,"Amps: ");
 FLASH_STRING(info15,"Int humid/temp: ");
 FLASH_STRING(info16,"Ext1 humid/temp: ");
 FLASH_STRING(info17,"Ext2 humid/temp: ");
-FLASH_STRING(reset1,"Resetting controler.\n");
+FLASH_STRING(reset1,"Resetting controller.\n");
 FLASH_STRING(exit1,"Closing connection. Goodbye...\n");
 FLASH_STRING(connect1,"\n\nAnother user is already connected.");
 FLASH_STRING(connect2,"\nOnly one user can connect at a time.\nClosing connection. Goodbye...\n\n");
@@ -336,7 +336,7 @@ void loop() {
 
   eclient = server.available();
 
-  //turn staus led on since the device is now operational
+  //turn status led on since the device is now operational
   digitalWrite(statusLED, HIGH);
 
   if (eclient && !newClient) {
@@ -450,7 +450,7 @@ void loop() {
 
 void process_command(String* command) {
   // this method takes the command string and then breaks it down
-  // looking for the relevant command and doing something with it or erroring.
+  // looking for the relevant command and doing something with it or giving an error.
   String argv[2]; // we have 2 args, the command and the param
   split(' ', *command, argv, 1); // so split only once
   int cmd_index = command_item(argv[0]);
@@ -833,7 +833,7 @@ void command_info(String args) {
   client->print(_VERSION);
   client->println();
 
-  //ip addr
+  //ip address
   eclient << info4;
   client->print(ip[0]);
   eclient << info5;
@@ -1116,9 +1116,9 @@ void writeLCD() {
       mins=secs/60; //convert seconds to minutes
       hours=mins/60; //convert minutes to hours
       days=hours/24; //convert hours to days
-      secs=secs-(mins*60); //subtract the coverted seconds to minutes in order to display 59 secs max
-      mins=mins-(hours*60); //subtract the coverted minutes to hours in order to display 59 minutes max
-      hours=hours-(days*24); //subtract the coverted hours to days in order to display 23 hours max
+      secs=secs-(mins*60); //subtract the converted seconds to minutes in order to display 59 secs max
+      mins=mins-(hours*60); //subtract the converted minutes to hours in order to display 59 minutes max
+      hours=hours-(days*24); //subtract the converted hours to days in order to display 23 hours max
 
       lcdSerial.write(dtostrf(days,2,0,dtostrfbuffer1)); //max uptime is about 50 days, so dont do more then 2 chars
       lcdSerial.write("Days ");
@@ -1217,7 +1217,7 @@ int checkDHT11(int sensorNumber) {
   case 0:
     { 
 
-      //get the humidiy
+      //get the humidity
       sensorData[startNum] = DHT11.humidity;
 
       //if user wanted f instead of c, convert
