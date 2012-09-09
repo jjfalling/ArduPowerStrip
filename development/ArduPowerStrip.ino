@@ -248,8 +248,15 @@ void setup() {
   for (x=0; x < numOfOutlets; x++) {
     int curr_pin=outlets[x];
     pinMode(curr_pin, OUTPUT);
-    //digitalWrite(curr_pin, HIGH);
-
+    
+    //set init pin state
+    if (relayType==0){
+      digitalWrite(curr_pin, HIGH);
+    }
+    else {
+      digitalWrite(curr_pin, LOW);
+    }
+    
     if (debug) Serial << boot2;
     if (debug) Serial.print(x +1);
     if (debug) Serial << boot3;
