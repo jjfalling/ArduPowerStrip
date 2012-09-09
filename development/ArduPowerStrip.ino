@@ -15,6 +15,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -change network/hostname over telnet? move said settings to flash. 
  -remove debug option for serial
  -various items commented as fix
+ -add snmp support
  
  -add amp/volt reporting (with option of using lcd display) - v3
  -add temp/humid sensing (int and ext sensors) - v3
