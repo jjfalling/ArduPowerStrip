@@ -313,7 +313,7 @@ void setup() {
   lcdSerial.write(22);                 // Turn backlight on
   lcdSerial.write(12);                 // Clear    
   delay(5);                            // Required delay  
-  lcdSerial.write(17);    // Turn backlight on
+  lcdSerial.write(17);                 // Turn backlight on
 
 
   //start up scale chirp thing
@@ -329,11 +329,11 @@ void setup() {
 
 
   //print name and version to lcd
-  lcdSerial.write(128);      // line 0 pos 0
+  lcdSerial.write(128);              // line 0 pos 0
   lcdSerial.write(" ");
   lcdSerial.write(_NAME); 
-  lcdSerial.write(148);      // line 1 pos 0
-  lcdSerial.write("       "); //as the version num changes, the padding may need adjusting
+  lcdSerial.write(148);            // line 1 pos 0
+  lcdSerial.write("       ");      //as the version num changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
 
 
