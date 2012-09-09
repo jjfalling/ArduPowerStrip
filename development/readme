@@ -1,7 +1,7 @@
 ArduPowerStrip - Dev version
-============================
+======================
 
-This is the dev version that is auto-pushed from my computer so when I do something stupid I can easily undo it.
-Considering every time I hit save the repo is commited and pushed, there will be bugs, if it works at all...
+This is the dev version of ArduPowerStrip. Any file under development/ is auto-pushed every time I hit save so I can easily undo mistakes. Considering this fact, I can almost guarantee there will be bugs and it won't work most of the time. 
+
 
 You've been warned ;)
