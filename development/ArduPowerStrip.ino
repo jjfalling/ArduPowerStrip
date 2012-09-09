@@ -64,7 +64,7 @@ const int  buttonPin = 3;
 const int lcdTxPin = 5;
 
 //How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
-const long lcdTimeout = 600000 ;
+const long lcdTimeout = 0 ;
 
 //What pin is the internal humid/temp (dht11) sensor on?
 #define intDHT11 7
