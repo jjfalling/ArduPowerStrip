@@ -40,9 +40,9 @@ byte subnet[] = {
 //Hostname
 const char hostname[] = "APS-rpc1";
 
-//You need to define the type of relay you are using or how you have it wired.
-//NC is 1, NO is 0.
-const int relayType = 1;    
+//You need to define the type of relay you are using or how you have it wired. Slso some relays are off on high while others are on at high. 
+//NC is 1 (off on low), NO is 0 (off on high).
+const int relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = { 
