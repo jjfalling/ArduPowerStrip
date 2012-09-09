@@ -274,14 +274,22 @@ void setup() {
   Serial << boot5;
 
 
-  com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help};
-  com[1]=(Command){"INFO", "Shows system information", command_info};
-  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status};
-  com[3]=(Command){"ON", "Sets an outlet to on", command_on};
-  com[4]=(Command){"OFF", "Sets an outlet to off", command_off};
-  com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot};
-  com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit};
-  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
+  com[0]=(Command){
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
+  com[1]=(Command){
+    "INFO", "Shows system information", command_info  };
+  com[2]=(Command){
+    "STATUS", "Shows the status of a outlet", command_status  };
+  com[3]=(Command){
+    "ON", "Sets an outlet to on", command_on  };
+  com[4]=(Command){
+    "OFF", "Sets an outlet to off", command_off  };
+  com[5]=(Command){
+    "REBOOT", "Reboots an outlet", command_reboot  };
+  com[6]=(Command){
+    "QUIT", "Quits this session gracefully", command_quit  };
+  com[7]=(Command){
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -298,18 +306,18 @@ void setup() {
   delay(5);                            // Required delay  
   lcdSerial.write(17);    // Turn backlight on
 
-  
+
   //start up scale chirp thing
-   lcdSerial.write(216);                //scale
-   lcdSerial.write(208);                //note
-   lcdSerial.write(220);                // play a
-   lcdSerial.write(222);                // play b
-   lcdSerial.write(223);                // play c
-   lcdSerial.write(225);                // play d
-   lcdSerial.write(227);                // play e
-   lcdSerial.write(228);                // play f
-   lcdSerial.write(230);                // play g
-   
+  lcdSerial.write(216);                //scale
+  lcdSerial.write(208);                //note
+  lcdSerial.write(220);                // play a
+  lcdSerial.write(222);                // play b
+  lcdSerial.write(223);                // play c
+  lcdSerial.write(225);                // play d
+  lcdSerial.write(227);                // play e
+  lcdSerial.write(228);                // play f
+  lcdSerial.write(230);                // play g
+
 
   //print name and version to lcd
   lcdSerial.write(128);      // line 0 pos 0
@@ -730,15 +738,15 @@ void set_outlet(int pin, int power_req) {
       if (relayType == 0) {
         digitalWrite(pin, LOW);
         delay (rebootDelay);
-          digitalWrite(pin, HIGH);
+        digitalWrite(pin, HIGH);
 
       }
 
       else {
         digitalWrite(pin, HIGH);
         delay (rebootDelay);
-          digitalWrite(pin, LOW);
-          
+        digitalWrite(pin, LOW);
+
       }
     }
     break;
@@ -987,8 +995,8 @@ void controlLCDBacklight() {
       buttonState = digitalRead(buttonPin);
     }
   }
-  
- 
+
+
   //Check if backlight is on and if the timeout has been reached. 
   if(backlight == true && lcdTimeout != 0){
     unsigned long currentMillis = millis();
@@ -1096,7 +1104,7 @@ void writeLCD() {
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd9; 
       lcdSerial.write(148);      // line 1 pos 0
-      
+
       //commented out due to lack of memory
 
       //following bit from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1294011483
@@ -1240,5 +1248,3 @@ int checkDHT11(int sensorNumber) {
 
 
 
-
-//test
