@@ -97,6 +97,7 @@ boolean debug = true;
 #include <SoftwareSerial.h>
 #include <dht11.h>
 
+//tell the dht lib we are using a DHT11
 dht11 DHT11;
 
 SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
