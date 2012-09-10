@@ -46,8 +46,7 @@ const char hostname[] = "APS-rpc1";
 
 //You need to define the type of relay you are using or how you have it wired. Some relays
 // are off when set to low while others are on while set to low. You many need to play with this.
-// Trying to simplify this, lets just use the following settings system-wide (assuming your relays
-// are wired for nc)
+// To try an make this more simple, here is a guide for if your relay is set to NO or NC:
 //NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high | 0 is off=pin low
 const boolean relayType = 1;    
 
