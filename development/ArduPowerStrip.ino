@@ -42,7 +42,8 @@ byte subnet[] = {
 //Hostname
 const char hostname[] = "APS-rpc1";
 
-//You need to define the type of relay you are using or how you have it wired.  Also some relays are off when set to low while others are on while set to low. You many need to play with this.
+//You need to define the type of relay you are using or how you have it wired.  Also some relays are off when set to low while others
+are on while set to low. You many need to play with this.
 // To try and make this as simple as possible, lets just use the following settings system-wide:
 // 1 is off=pin low | 0 is off=pin high
 const boolean relayType = 1;    
@@ -256,7 +257,7 @@ void setup() {
   for (x=0; x < numOfOutlets; x++) {
     int curr_pin=outlets[x];
     pinMode(curr_pin, OUTPUT);
-    
+
     //set init pin state for the relay according to user settings
     if (relayType==0){
       digitalWrite(curr_pin, HIGH);
@@ -264,7 +265,7 @@ void setup() {
     else {
       digitalWrite(curr_pin, LOW);
     }
-    
+
     if (debug) Serial << boot2;
     if (debug) Serial.print(x +1);
     if (debug) Serial << boot3;
@@ -291,21 +292,21 @@ void setup() {
 
 
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help    };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info  };
+    "INFO", "Shows system information", command_info    };
   com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status  };
+    "STATUS", "Shows the status of a outlet", command_status    };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on  };
+    "ON", "Sets an outlet to on", command_on    };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off  };
+    "OFF", "Sets an outlet to off", command_off    };
   com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot  };
+    "REBOOT", "Reboots an outlet", command_reboot    };
   com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit  };
+    "QUIT", "Quits this session gracefully", command_quit    };
   com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset    };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -468,12 +469,12 @@ void process_command(String* command) {
   String argv[2]; // we have 2 args, the command and the param
   split(' ', *command, argv, 1); // so split only once
   int cmd_index = command_item(argv[0]);
-  
+
   //check if the all param was used. if so, change the allRequested to true
   if (argv[1] == "all"){
-   allRequested = true; 
+    allRequested = true; 
   }
-  
+
   if (cmd_index >= 0) {
     com[cmd_index].cmd(argv[1]);
   } 
@@ -515,77 +516,77 @@ void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
 
- 
-  int pin = atoi(&args[0]);
+
+    int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-  
+
   if (validateError == true){
     validateError = false;
     return;
   }
   else {
 
-  int realPin = pin -1;
-  realPin = outlets[realPin];
+    int realPin = pin -1;
+    realPin = outlets[realPin];
 
-  client->println();
-  eclient << status4;
-  client->print(pin);
-  eclient << status5;
+    client->println();
+    eclient << status4;
+    client->print(pin);
+    eclient << status5;
 
-  int stat_pin = (digitalRead(realPin));
+    int stat_pin = (digitalRead(realPin));
 
-  if (relayType == 0) {
+    if (relayType == 0) {
 
-    switch (stat_pin){
+      switch (stat_pin){
 
-      //is off
-    case false:
-      eclient << status6;
-      print_prompt();
-      break;
+        //is off
+      case false:
+        eclient << status6;
+        print_prompt();
+        break;
 
-      //is on
-    case true:
-      eclient << status7;
-      print_prompt();
-      break;
+        //is on
+      case true:
+        eclient << status7;
+        print_prompt();
+        break;
 
-      //unknown
-    default:
-      eclient << status8;
-      client->println(stat_pin);
-      print_prompt();
-      break;
+        //unknown
+      default:
+        eclient << status8;
+        client->println(stat_pin);
+        print_prompt();
+        break;
 
+      }
     }
-  }
-  else {
+    else {
 
-    switch (stat_pin){
+      switch (stat_pin){
 
-      //is off
-    case true: 
-      eclient << status6;
-      print_prompt();
-      break;
+        //is off
+      case true: 
+        eclient << status6;
+        print_prompt();
+        break;
 
-      //is on
-    case false:
-      eclient << status7;
-      print_prompt();
-      break;
+        //is on
+      case false:
+        eclient << status7;
+        print_prompt();
+        break;
 
-      //unknown
-    default:
-      eclient << status8;
-      client->println(stat_pin);
-      print_prompt();
-      break;
+        //unknown
+      default:
+        eclient << status8;
+        client->println(stat_pin);
+        print_prompt();
+        break;
 
+      }
     }
-  }
   }
 }
 
@@ -604,20 +605,20 @@ void command_on(String args) {
   }
   else {
 
-  int realPin = pin -1;
-  realPin = outlets[realPin];
+    int realPin = pin -1;
+    realPin = outlets[realPin];
 
 
-  client->println();
-  eclient << set1;
-  client->print(pin);
-  eclient << set2;
-  eclient << on1;
+    client->println();
+    eclient << set1;
+    client->print(pin);
+    eclient << set2;
+    eclient << on1;
 
-  set_outlet(realPin, 1);
-  eclient << done1; 
+    set_outlet(realPin, 1);
+    eclient << done1; 
 
-  print_prompt();
+    print_prompt();
   }
 }
 
@@ -629,27 +630,27 @@ void command_off(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-  
+
   if (validateError == true){
     validateError = false;
     return;
   }
   else {
-    
-  int realPin = pin -1;
-  realPin = outlets[realPin];
+
+    int realPin = pin -1;
+    realPin = outlets[realPin];
 
 
-  client->println();
-  eclient << set1;
-  client->print(pin);
-  eclient << set2;
-  eclient << off1;
-  set_outlet(realPin, 2);
-  eclient << done1;  
-  print_prompt();
+    client->println();
+    eclient << set1;
+    client->print(pin);
+    eclient << set2;
+    eclient << off1;
+    set_outlet(realPin, 2);
+    eclient << done1;  
+    print_prompt();
   }
-  
+
 }
 
 
@@ -664,20 +665,20 @@ void command_reboot(String args) {
     validateError = false;
     return;
   }
-  
-  else {
-  int realPin = pin -1;
-  realPin = outlets[realPin];
 
-  client->println();
-  eclient << reboot1;
-  client->print(pin);
-  eclient << reboot2;
-  client->print(rebootDelay);
-  eclient << reboot3;
-  set_outlet(realPin, 3);
-  eclient << done1;
-  print_prompt();
+  else {
+    int realPin = pin -1;
+    realPin = outlets[realPin];
+
+    client->println();
+    eclient << reboot1;
+    client->print(pin);
+    eclient << reboot2;
+    client->print(rebootDelay);
+    eclient << reboot3;
+    set_outlet(realPin, 3);
+    eclient << done1;
+    print_prompt();
   }
 }
 
@@ -1109,7 +1110,7 @@ void writeLCD() {
       lcdSerial.write(":");
       lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
 
-	  //since this is the last screen, reset the counter to start over
+      //since this is the last screen, reset the counter to start over
       lcdCounter=0;
       previousMillisLCDT = millis();
 
@@ -1228,9 +1229,9 @@ void validatePin(int pin, String args){
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
-	validateError=true;
-	}	
-  
+    validateError=true;
+  }	
+
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
@@ -1244,6 +1245,7 @@ void validatePin(int pin, String args){
   }
 
 }
+
 
 
 
