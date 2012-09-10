@@ -714,7 +714,7 @@ void set_outlet(int pin, int power_req) {
     break;
 
     //reboot
-    //FIX: change from delay to something else so other tasks dont pause (such as status light)
+    //FIX: change from delay to something else so other tasks dont pause (such as status light, sensor updates, etc)
   case 3:
     {
       if (relayType == 0) {
