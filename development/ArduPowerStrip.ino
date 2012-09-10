@@ -515,7 +515,7 @@ void command_status(String args) {
     print_prompt();
     return;
   }
-  if (args.length() > 2) {
+  if (args.length() > 3) {
     eclient << error_2;
     print_prompt();
     return;
