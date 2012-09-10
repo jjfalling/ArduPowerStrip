@@ -172,6 +172,8 @@ boolean newClient = false;
 
 boolean allRequested = false;
 
+boolean validateError = false;
+
 byte firstClientIP[4];
 
 //init the ethernet library here so we can use it outside of the main loop.
@@ -1059,7 +1061,6 @@ void writeLCD() {
       lcdSerial << lcd9; 
       lcdSerial.write(148);      // line 1 pos 0
 
-      //commented out due to lack of memory
 
       //following bit from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1294011483
       int days=0;
@@ -1083,7 +1084,7 @@ void writeLCD() {
       lcdSerial.write(":");
       lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
 
-
+	  //since this is the last screen, reset the counter to start over
       lcdCounter=0;
       previousMillisLCDT = millis();
 
