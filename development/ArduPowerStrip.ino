@@ -1267,7 +1267,7 @@ int checkDHT11(int sensorNumber) {
 }
 
 
-void validatePin(int pin){
+void validatePin(int pin, String args){
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
