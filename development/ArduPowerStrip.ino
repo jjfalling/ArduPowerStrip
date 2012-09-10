@@ -595,6 +595,7 @@ void command_on(String args) {
   if (validateError = false){
     return;
   }
+  else {
 
   int realPin = pin -1;
   realPin = outlets[realPin];
@@ -610,7 +611,7 @@ void command_on(String args) {
   eclient << done1; 
 
   print_prompt();
-
+  }
 }
 
 
@@ -621,7 +622,12 @@ void command_off(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-
+  
+  if (validateError = false){
+    return;
+  }
+  else {
+    
   int realPin = pin -1;
   realPin = outlets[realPin];
 
@@ -634,7 +640,8 @@ void command_off(String args) {
   set_outlet(realPin, 2);
   eclient << done1;  
   print_prompt();
-
+  }
+  
 }
 
 
@@ -645,7 +652,12 @@ void command_reboot(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-
+  if (validateError = true){
+    validateError = false
+    return;
+  }
+  
+  else {
   int realPin = pin -1;
   realPin = outlets[realPin];
 
@@ -658,6 +670,7 @@ void command_reboot(String args) {
   set_outlet(realPin, 3);
   eclient << done1;
   print_prompt();
+  }
 }
 
 
