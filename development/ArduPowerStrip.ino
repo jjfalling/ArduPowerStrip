@@ -1234,7 +1234,6 @@ void validatePin(int pin, String args){
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
-    return;
     validateError=true;
   }
 
@@ -1245,6 +1244,7 @@ void validatePin(int pin, String args){
   }
 
 }
+
 
 
 
