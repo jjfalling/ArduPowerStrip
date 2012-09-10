@@ -592,6 +592,10 @@ void command_on(String args) {
 
   validatePin(pin, args);
 
+  if (validateError = false){
+    return;
+  }
+
   int realPin = pin -1;
   realPin = outlets[realPin];
 
