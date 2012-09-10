@@ -170,6 +170,8 @@ const int numOfOutlets = (sizeof(outlets))/2;
 EthernetServer server(23);
 boolean newClient = false;
 
+boolean allRequested = false;
+
 byte firstClientIP[4];
 
 //init the ethernet library here so we can use it outside of the main loop.
@@ -465,9 +467,12 @@ void process_command(String* command) {
   // looking for the relevant command and doing something with it or giving an error.
   String argv[2]; // we have 2 args, the command and the param
   split(' ', *command, argv, 1); // so split only once
-  Serial.println(
   int cmd_index = command_item(argv[0]);
-  if (cmd_index >= 0) {argv[1]);
+  
+  //check if the all param was used. if so, change the allRequested to true
+  Serial.println(argv[1]);
+  
+  if (cmd_index >= 0) {
     com[cmd_index].cmd(argv[1]);
   } 
   else {
