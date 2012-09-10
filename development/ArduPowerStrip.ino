@@ -516,32 +516,10 @@ void command_status(String args) {
  
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
-    return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
-    return;
-  }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
+  validatePin(pin, args);
 
   int realPin = pin -1;
   realPin = outlets[realPin];
-
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
 
   client->println();
   eclient << status4;
@@ -610,22 +588,7 @@ void command_on(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
-    return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
-    return;
-  }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
+  validatePin(pin, args);
 
   int realPin = pin -1;
   realPin = outlets[realPin];
@@ -651,22 +614,7 @@ void command_off(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
-    return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
-    return;  
-  }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
+  validatePin(pin, args);
 
   int realPin = pin -1;
   realPin = outlets[realPin];
@@ -691,24 +639,7 @@ void command_reboot(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-/*
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
-    return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
-    return;
-  }
 
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
-*/
   int realPin = pin -1;
   realPin = outlets[realPin];
 
