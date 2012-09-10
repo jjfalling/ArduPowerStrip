@@ -470,7 +470,9 @@ void process_command(String* command) {
   int cmd_index = command_item(argv[0]);
   
   //check if the all param was used. if so, change the allRequested to true
-  Serial.println(argv[1]);
+  if (argv[1] == "all"){
+   allRequested = true; 
+  }
   
   if (cmd_index >= 0) {
     com[cmd_index].cmd(argv[1]);
@@ -515,6 +517,22 @@ void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
  
+ if (allRequested = true){
+
+	//reset allRequested
+   allRequested = false;
+   
+  int x;
+  for (x=0; x < numOfOutlets; x++) {
+    
+    command_status(curr_pin);
+    
+  
+   }
+
+   else {
+
+ 
   int pin = atoi(&args[0]);
 
   if (args.length() <= 0) {
@@ -522,7 +540,7 @@ void command_status(String args) {
     print_prompt();
     return;
   }
-  if (args.length() > 3) {
+  if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
     return;
@@ -601,6 +619,7 @@ void command_status(String args) {
 
     }
   }
+}
 
 }
 
