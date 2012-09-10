@@ -690,7 +690,7 @@ void command_reboot(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  validatePin(pin);
+  validatePin(pin, args);
 /*
   if (args.length() <= 0) {
     eclient << error_1;
