@@ -1223,7 +1223,7 @@ int checkDHT11(int sensorNumber) {
 
 }
 
-
+//here is a function to validate the pin input the user requested
 void validatePin(int pin, String args){
   if (args.length() <= 0) {
     eclient << error_1;
@@ -1234,6 +1234,7 @@ void validatePin(int pin, String args){
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
+    return;
     validateError=true;
   }
 
