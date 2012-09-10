@@ -516,21 +516,6 @@ int command_item(String cmd_code) {
 void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
- 
- if (allRequested = true){
-
-	//reset allRequested
-   allRequested = false;
-   
-  int x;
-  for (x=0; x < numOfOutlets; x++) {
-    
-    command_status(curr_pin);
-    
-  
-   }
-
-   else {
 
  
   int pin = atoi(&args[0]);
@@ -619,7 +604,6 @@ void command_status(String args) {
 
     }
   }
-}
 
 }
 
