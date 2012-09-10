@@ -1268,5 +1268,25 @@ int checkDHT11(int sensorNumber) {
 }
 
 
+void validatePin(){
+  if (args.length() <= 0) {
+    eclient << error_1;
+    print_prompt();
+    return;
+  }
+  if (args.length() > 2) {
+    eclient << error_2;
+    print_prompt();
+    return;
+  }
 
+  if (pin > numOfOutlets || pin < 1) {
+    eclient << error_3;
+    print_prompt();
+    return;
+  }
+
+  int realPin = pin -1;
+  realPin = outlets[realPin];
+}
 
