@@ -508,6 +508,7 @@ int command_item(String cmd_code) {
 void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
+ 
   int pin = atoi(&args[0]);
 
   if (args.length() <= 0) {
