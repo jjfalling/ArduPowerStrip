@@ -345,7 +345,6 @@ void setup() {
 }
 
 
-
 void loop() {
 
   eclient = server.available();
@@ -458,9 +457,8 @@ void loop() {
 }
 
 
-
 //############################
-//start defining commands
+//start defining commands/functions
 
 void process_command(String* command) {
   // this method takes the command string and then breaks it down
@@ -485,6 +483,7 @@ void process_command(String* command) {
   return;
 }
 
+
 int command_item(String cmd_code) {
   // this method does all of the comparison stuff to determine the id of a command
   // which it then passes back
@@ -508,9 +507,6 @@ int command_item(String cmd_code) {
   }
 
 }
-
-
-
 
 
 void command_status(String args) {
@@ -607,6 +603,7 @@ void command_status(String args) {
 
 }
 
+
 void command_on(String args) {
 
   // argument passed in should simply be a number and it's that one we read.
@@ -647,6 +644,7 @@ void command_on(String args) {
 
 }
 
+
 void command_off(String args) {
 
   // argument passed in should simply be a number and it's that one we read.
@@ -684,6 +682,7 @@ void command_off(String args) {
   print_prompt();
 
 }
+
 
 void command_reboot(String args) {
 
@@ -955,7 +954,6 @@ void command_quit(String args) {
 }
 
 
-
 //user wanted to reset controller
 void command_reset(String args) {
   client->println();
@@ -972,6 +970,7 @@ void command_reset(String args) {
 
 
 }
+
 
 //This bit from http://www.faludi.com/itp/arduino/Arduino_Available_RAM_Test.pde :
 // this function will return the number of bytes currently free in RAM
@@ -1161,8 +1160,6 @@ void writeLCD() {
 
   }
 }
-
-
 
 
 void updateSensors() {
