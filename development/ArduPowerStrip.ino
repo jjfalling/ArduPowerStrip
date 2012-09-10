@@ -23,9 +23,11 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  
  */
 
+
 //################## 
 //User settings
 //################## 
+
 //Keep in mind, standard ethernet shield reserves pins 4,10,11,12,13
 //Also, you can use analog pins instead of dig pins by using A[pin number]. I have only tested this with relays.
 
@@ -85,9 +87,13 @@ boolean tempF = true;
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
 
+
 //################## 
 //End user settings
 //################## 
+
+
+
 
 //start global section
 
@@ -159,7 +165,7 @@ int sensorCounter = 0;
 long previousMillisLCDT = 0;
 int lcdCounter = 0;
 
-//FIX: Need to make this automatic:
+//set this to the number of commands that are defined
 #define MAX_COMMANDS 8
 Command com[MAX_COMMANDS]={
 };
