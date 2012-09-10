@@ -465,8 +465,9 @@ void process_command(String* command) {
   // looking for the relevant command and doing something with it or giving an error.
   String argv[2]; // we have 2 args, the command and the param
   split(' ', *command, argv, 1); // so split only once
+  Serial.println(
   int cmd_index = command_item(argv[0]);
-  if (cmd_index >= 0) {
+  if (cmd_index >= 0) {argv[1]);
     com[cmd_index].cmd(argv[1]);
   } 
   else {
