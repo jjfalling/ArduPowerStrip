@@ -1285,8 +1285,6 @@ void validatePin(int pin, String args){
     return;
   }
 
-  int realPin = pin -1;
-  realPin = outlets[realPin];
 }
 
 
