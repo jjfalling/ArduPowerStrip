@@ -1202,18 +1202,19 @@ void validatePin(int pin, String args){
   if (args.length() <= 0) {
     eclient << error_1;
     print_prompt();
-    return;
-  }
+	validateError=true;
+	}	
+  
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
-    return;
+    validateError=true;
   }
 
   if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
-    return;
+    validateError=true;
   }
 
 }
