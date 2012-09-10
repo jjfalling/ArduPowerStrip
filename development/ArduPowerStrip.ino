@@ -519,6 +519,12 @@ void command_status(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
+  
+  if (validateError == true){
+    validateError = false;
+    return;
+  }
+  else {
 
   int realPin = pin -1;
   realPin = outlets[realPin];
@@ -580,7 +586,7 @@ void command_status(String args) {
 
     }
   }
-
+  }
 }
 
 
@@ -592,7 +598,8 @@ void command_on(String args) {
 
   validatePin(pin, args);
 
-  if (validateError = false){
+  if (validateError == true){
+    validateError = false;
     return;
   }
   else {
@@ -623,7 +630,8 @@ void command_off(String args) {
 
   validatePin(pin, args);
   
-  if (validateError = false){
+  if (validateError == true){
+    validateError = false;
     return;
   }
   else {
@@ -652,8 +660,8 @@ void command_reboot(String args) {
   int pin = atoi(&args[0]);
 
   validatePin(pin, args);
-  if (validateError = true){
-    validateError = false
+  if (validateError == true){
+    validateError = false;
     return;
   }
   
