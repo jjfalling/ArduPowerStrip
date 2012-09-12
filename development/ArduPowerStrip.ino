@@ -7,6 +7,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  Much of this is based off of this: https://github.com/ajfisher/arduino-command-server
  Also where I found the split library
  Flash library found here: http://arduiniana.org/libraries/flash/
+ Also took current/voltage stuff from here:http://www.desert-home.com/p/test-html-code.html
  
  TODO:
  -enable telent session timeout
@@ -52,7 +53,7 @@ const boolean relayType = 1;
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = { 
-  A0,A1,A2,A3,A4,A5};
+  A0,A1,A2,A3};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 const int rebootDelay = 3000; 
@@ -83,6 +84,10 @@ const long lcdTimeout = 0 ;
 
 //Do you want fahrenheit or celsius? True is f, false if c
 boolean tempF = true;
+
+//Set Voltage and current input pins
+int inPinV = 4;
+int inPinI = 5;
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
