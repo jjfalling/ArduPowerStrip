@@ -358,6 +358,7 @@ void setup() {
   lcdSerial.write("       ");      //as the version changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
 
+  emon1.current(A5, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
 }
 
@@ -1023,6 +1024,8 @@ void writeLCD() {
     if (lcdCounter == 0 ) {
 
 
+      double Irms = emon1.calcIrms(1480);  // Calculate Irms only
+      
       //FIX: make real data go to the lcd:
       lcdSerial.write(12);                 // Clear    
       delay(5);                            // Required delay
@@ -1031,7 +1034,7 @@ void writeLCD() {
       lcdSerial.print("000.0"); 
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd2;  
-      lcdSerial.print("00.0");
+      lcdSerial.print(Irms);
 
 
       lcdCounter++;
