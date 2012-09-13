@@ -85,8 +85,10 @@ const long lcdTimeout = 600000 ;
 //Do you want fahrenheit or celsius? True is f, false if c
 boolean tempF = true;
 
-//Set Voltage and current input pins
+//What pin are you using to sense voltage?
 int voltSensorPin = 4;
+
+//What pin are you using to sense amperage?
 int ampSensorPin = 5;
 
 //FIX rm this: Enable serial debug? 
