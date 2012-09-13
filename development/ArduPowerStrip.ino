@@ -896,7 +896,7 @@ void command_info(String args) {
 
   //amp sensor
   eclient << info14;
-  client->println();
+  client->println(Irms);
 
   //humid/temp sensors
   eclient << info15;
