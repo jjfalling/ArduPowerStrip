@@ -486,6 +486,11 @@ void loop() {
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
  // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+ 
+   //show free mem
+  eclient << info3;
+  int result = memoryTest();
+  Serial->println(result,DEC);
 
 }
 
