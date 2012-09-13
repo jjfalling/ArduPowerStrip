@@ -256,6 +256,7 @@ FLASH_STRING(lcd7,"Temp2:     ");
 FLASH_STRING(lcd8,"Temp3:     ");
 FLASH_STRING(lcd9,"     Uptime:");
 
+double Irms;
 
 //end of global section
 //########################## 
@@ -471,6 +472,9 @@ void loop() {
 
   //write data to lcd
   writeLCD();
+  
+  //update power usage
+  Irms = emon1.calcIrms(1480);  // Calculate Irms only
 
 }
 
@@ -1024,7 +1028,7 @@ void writeLCD() {
     if (lcdCounter == 0 ) {
 
 
-      double Irms = emon1.calcIrms(1480);  // Calculate Irms only
+      Irms = emon1.calcIrms(1480);  // Calculate Irms only
       
       //FIX: make real data go to the lcd:
       lcdSerial.write(12);                 // Clear    
