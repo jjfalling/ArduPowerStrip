@@ -109,6 +109,8 @@ boolean debug = true;
 #include <avr/wdt.h>
 #include <SoftwareSerial.h>
 #include <dht11.h>
+#include "EmonLib.h"                   // Include Emon Library
+EnergyMonitor emon1;                   // Create an instance
 
 //tell the dht lib we are using a DHT11
 dht11 DHT11;
