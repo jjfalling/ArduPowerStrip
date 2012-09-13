@@ -7,7 +7,9 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  Much of this is based off of this: https://github.com/ajfisher/arduino-command-server
  Also where I found the split library
  Flash library found here: http://arduiniana.org/libraries/flash/
- Also took current/voltage stuff from here:http://www.desert-home.com/p/test-html-code.html
+ Got EmonLib from here: http://openenergymonitor.org
+ 
+ Also modified EmonLib using http://roysoala.wordpress.com/2012/04/20/energy-monitoring-using-pachube-and-arduino-1-0/
  
  TODO:
  -enable telent session timeout
