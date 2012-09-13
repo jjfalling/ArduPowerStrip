@@ -118,7 +118,7 @@ boolean debug = true;
  // Create an instance
 EnergyMonitor emon1;                  
 
-//tell the dht lib we are using a DHT11
+//Define the dht instance
 dht11 DHT11;
 
 SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
