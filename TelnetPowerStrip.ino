@@ -7,6 +7,9 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  Much of this is based off of this: https://github.com/ajfisher/arduino-command-server
  Also where I found the split library
  Flash library found here: http://arduiniana.org/libraries/flash/
+ Got EmonLib from here: http://openenergymonitor.org
+ 
+ Also modified EmonLib using http://roysoala.wordpress.com/2012/04/20/energy-monitoring-using-pachube-and-arduino-1-0/
  
  TODO:
  -enable telent session timeout
@@ -14,17 +17,21 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -on/off/reboot/status all
  -change network/hostname over telnet? move said settings to flash. 
  -remove debug option for serial
- -varrious items commented as fix
+ -various items commented as fix
+ -add snmp support
+ -up/down arrows
  
- -add amp/volt reporting (with option of using lcd display) - v3
- -add temp/humid sensing (int and ext sensors) - v3
+ -add volt reporting (with option of using lcd display) - v3
+
  
  */
+
 
 //################## 
 //User settings
 //################## 
-//Keep in mind, standard ethernet sheild reserves pins 4,10,11,12,13
+
+//Keep in mind, standard ethernet shield reserves pins 4,10,11,12,13
 //Also, you can use analog pins instead of dig pins by using A[pin number]. I have only tested this with relays.
 
 //Network info
@@ -40,9 +47,11 @@ byte subnet[] = {
 //Hostname
 const char hostname[] = "APS-rpc1";
 
-//You need to define the type of relay you are using or how you have it wired.
-//NC is 1, NO is 0.
-const int relayType = 1;    
+//You need to define the type of relay you are using or how you have it wired. Some relays
+// are off when set to low while others are on while set to low. You many need to play with this.
+// To try an make this more simple, here is a guide for if your relay is set to NO or NC:
+//NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high | 0 is off=pin low
+const boolean relayType = 1;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = { 
@@ -63,8 +72,8 @@ const int  buttonPin = 3;
 //What pin is the lcd serial pin connected to?
 const int lcdTxPin = 5;
 
-//How long should the lcd be on before it turns its self off (in ms) [this is to save power]? 
-const long lcdTimeout = 360000;
+//How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
+const long lcdTimeout = 600000 ;
 
 //What pin is the internal humid/temp (dht11) sensor on?
 #define intDHT11 7
@@ -78,12 +87,22 @@ const long lcdTimeout = 360000;
 //Do you want fahrenheit or celsius? True is f, false if c
 boolean tempF = true;
 
+//What pin are you using to sense voltage?
+int voltSensorPin = 4;
+
+//What pin are you using to sense amperage?
+int ampSensorPin = 5;
+
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
+
 
 //################## 
 //End user settings
 //################## 
+
+
+
 
 //start global section
 
@@ -94,7 +113,12 @@ boolean debug = true;
 #include <avr/wdt.h>
 #include <SoftwareSerial.h>
 #include <dht11.h>
+#include <EmonLib.h>
 
+ // Create an instance
+EnergyMonitor emon1;                  
+
+//tell the dht lib we are using a DHT11
 dht11 DHT11;
 
 SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
@@ -154,7 +178,7 @@ int sensorCounter = 0;
 long previousMillisLCDT = 0;
 int lcdCounter = 0;
 
-//FIX: Need to make this automatic:
+//set this to the number of commands that are defined
 #define MAX_COMMANDS 8
 Command com[MAX_COMMANDS]={
 };
@@ -165,6 +189,10 @@ const int numOfOutlets = (sizeof(outlets))/2;
 // start server on port 23 (telnet)
 EthernetServer server(23);
 boolean newClient = false;
+
+boolean allRequested = false;
+
+boolean validateError = false;
 
 byte firstClientIP[4];
 
@@ -218,21 +246,23 @@ FLASH_STRING(info14,"Amps: ");
 FLASH_STRING(info15,"Int humid/temp: ");
 FLASH_STRING(info16,"Ext1 humid/temp: ");
 FLASH_STRING(info17,"Ext2 humid/temp: ");
-FLASH_STRING(reset1,"Resetting controler.\n");
+FLASH_STRING(reset1,"Resetting controller.\n");
 FLASH_STRING(exit1,"Closing connection. Goodbye...\n");
 FLASH_STRING(connect1,"\n\nAnother user is already connected.");
 FLASH_STRING(connect2,"\nOnly one user can connect at a time.\nClosing connection. Goodbye...\n\n");
 FLASH_STRING(connect3,"Second user tried to connect");
 FLASH_STRING(lcd1,"Volts:     ");
 FLASH_STRING(lcd2,"Amps:       ");
-FLASH_STRING(lcd3,"Humid1:   ");
-FLASH_STRING(lcd4,"Humid2:   ");
-FLASH_STRING(lcd5,"Humid3:   ");
-FLASH_STRING(lcd6,"Temp1:    ");
-FLASH_STRING(lcd7,"Temp2:    ");
-FLASH_STRING(lcd8,"Temp3:    ");
+FLASH_STRING(lcd3,"Humid1:     ");
+FLASH_STRING(lcd4,"Humid2:     ");
+FLASH_STRING(lcd5,"Humid3:     ");
+FLASH_STRING(lcd6,"Temp1:     ");
+FLASH_STRING(lcd7,"Temp2:     ");
+FLASH_STRING(lcd8,"Temp3:     ");
 FLASH_STRING(lcd9,"     Uptime:");
 
+double Irms;
+double Vrms;
 
 //end of global section
 //########################## 
@@ -243,11 +273,19 @@ void setup() {
   client = &Serial;
   if (debug) Serial << boot1;
 
-  //set the pin modes
+  //set the pin modes 
   int x;
   for (x=0; x < numOfOutlets; x++) {
     int curr_pin=outlets[x];
     pinMode(curr_pin, OUTPUT);
+
+    //set init pin state for the relay according to user settings
+    if (relayType==0){
+      digitalWrite(curr_pin, HIGH);
+    }
+    else {
+      digitalWrite(curr_pin, LOW);
+    }
 
     if (debug) Serial << boot2;
     if (debug) Serial.print(x +1);
@@ -274,14 +312,22 @@ void setup() {
   Serial << boot5;
 
 
-  com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help};
-  com[1]=(Command){"INFO", "Shows system information", command_info};
-  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status};
-  com[3]=(Command){"ON", "Sets an outlet to on", command_on};
-  com[4]=(Command){"OFF", "Sets an outlet to off", command_off};
-  com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot};
-  com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit};
-  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
+  com[0]=(Command){
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help};
+  com[1]=(Command){
+    "INFO", "Shows system information", command_info};
+  com[2]=(Command){
+    "STATUS", "Shows the status of a outlet", command_status};
+  com[3]=(Command){
+    "ON", "Sets an outlet to on", command_on};
+  com[4]=(Command){
+    "OFF", "Sets an outlet to off", command_off};
+  com[5]=(Command){
+    "REBOOT", "Reboots an outlet", command_reboot};
+  com[6]=(Command){
+    "QUIT", "Quits this session gracefully", command_quit};
+  com[7]=(Command){
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -296,39 +342,42 @@ void setup() {
   lcdSerial.write(22);                 // Turn backlight on
   lcdSerial.write(12);                 // Clear    
   delay(5);                            // Required delay  
-  lcdSerial.write(17);    // Turn backlight on
+  lcdSerial.write(17);                 // Turn backlight on
 
-  
+
   //start up scale chirp thing
-   lcdSerial.write(216);                //scale
-   lcdSerial.write(208);                //note
-   lcdSerial.write(220);                // play a
-   lcdSerial.write(222);                // play b
-   lcdSerial.write(223);                // play c
-   lcdSerial.write(225);                // play d
-   lcdSerial.write(227);                // play e
-   lcdSerial.write(228);                // play f
-   lcdSerial.write(230);                // play g
-   
+  lcdSerial.write(216);                //scale
+  lcdSerial.write(208);                //note
+  lcdSerial.write(220);                // play a
+  lcdSerial.write(222);                // play b
+  lcdSerial.write(223);                // play c
+  lcdSerial.write(225);                // play d
+  lcdSerial.write(227);                // play e
+  lcdSerial.write(228);                // play f
+  lcdSerial.write(230);                // play g
+
 
   //print name and version to lcd
-  lcdSerial.write(128);      // line 0 pos 0
+  lcdSerial.write(128);              // line 0 pos 0
   lcdSerial.write(" ");
   lcdSerial.write(_NAME); 
-  lcdSerial.write(148);      // line 1 pos 0
-  lcdSerial.write("       "); //as the version num changes, the padding may need adjusting
+  lcdSerial.write(148);            // line 1 pos 0
+  lcdSerial.write("       ");      //as the version changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
 
 
-}
+  //update voltage and amperage data
+  emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
+  emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
+}
 
 
 void loop() {
 
   eclient = server.available();
 
-  //turn staus led on since the device is now operational
+  //turn status led on since the device is now operational
   digitalWrite(statusLED, HIGH);
 
   if (eclient && !newClient) {
@@ -433,19 +482,28 @@ void loop() {
   //write data to lcd
   writeLCD();
 
+  //update power usage
+  Irms = emon1.calcIrms(1480);  // Calculate Irms only
+ // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+
 }
 
 
-
 //############################
-//start defining commands
+//start defining commands/functions
 
 void process_command(String* command) {
   // this method takes the command string and then breaks it down
-  // looking for the relevant command and doing something with it or erroring.
+  // looking for the relevant command and doing something with it or giving an error.
   String argv[2]; // we have 2 args, the command and the param
   split(' ', *command, argv, 1); // so split only once
   int cmd_index = command_item(argv[0]);
+
+  //check if the all param was used. if so, change the allRequested to true
+  if (argv[1] == "all"){
+    allRequested = true; 
+  }
+
   if (cmd_index >= 0) {
     com[cmd_index].cmd(argv[1]);
   } 
@@ -456,6 +514,7 @@ void process_command(String* command) {
 
   return;
 }
+
 
 int command_item(String cmd_code) {
   // this method does all of the comparison stuff to determine the id of a command
@@ -482,100 +541,84 @@ int command_item(String cmd_code) {
 }
 
 
-
-
-
 void command_status(String args) {
   // argument passed in should simply be a number and it's that one we read.
   // we do need to get both chars though because it can be 2 digits
-  int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
+
+    int pin = atoi(&args[0]);
+
+  validatePin(pin, args);
+
+  if (validateError == true){
+    validateError = false;
     return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
-    return;
-  }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
-
-  int realPin = pin -1;
-  realPin = outlets[realPin];
-
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
-
-  client->println();
-  eclient << status4;
-  client->print(pin);
-  eclient << status5;
-
-  int stat_pin = (digitalRead(realPin));
-
-  if (relayType == 0) {
-
-    switch (stat_pin){
-
-      //is off
-    case false:
-      eclient << status6;
-      print_prompt();
-      break;
-
-      //is on
-    case true:
-      eclient << status7;
-      print_prompt();
-      break;
-
-      //unknown
-    default:
-      eclient << status8;
-      client->println(stat_pin);
-      print_prompt();
-      break;
-
-    }
   }
   else {
 
-    switch (stat_pin){
+    int realPin = pin -1;
+    realPin = outlets[realPin];
 
-      //is off
-    case true: 
-      eclient << status6;
-      print_prompt();
-      break;
+    client->println();
+    eclient << status4;
+    client->print(pin);
+    eclient << status5;
 
-      //is on
-    case false:
-      eclient << status7;
-      print_prompt();
-      break;
+    int stat_pin = (digitalRead(realPin));
 
-      //unknown
-    default:
-      eclient << status8;
-      client->println(stat_pin);
-      print_prompt();
-      break;
+    if (relayType == 0) {
 
+      switch (stat_pin){
+
+        //is off
+      case false:
+        eclient << status6;
+        print_prompt();
+        break;
+
+        //is on
+      case true:
+        eclient << status7;
+        print_prompt();
+        break;
+
+        //unknown
+      default:
+        eclient << status8;
+        client->println(stat_pin);
+        print_prompt();
+        break;
+
+      }
+    }
+    else {
+
+      switch (stat_pin){
+
+        //is off
+      case true: 
+        eclient << status6;
+        print_prompt();
+        break;
+
+        //is on
+      case false:
+        eclient << status7;
+        print_prompt();
+        break;
+
+        //unknown
+      default:
+        eclient << status8;
+        client->println(stat_pin);
+        print_prompt();
+        break;
+
+      }
     }
   }
-
 }
+
 
 void command_on(String args) {
 
@@ -583,39 +626,31 @@ void command_on(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
+  validatePin(pin, args);
+
+  if (validateError == true){
+    validateError = false;
     return;
   }
-  if (args.length() > 2) {
-    eclient << error_2;
+  else {
+
+    int realPin = pin -1;
+    realPin = outlets[realPin];
+
+
+    client->println();
+    eclient << set1;
+    client->print(pin);
+    eclient << set2;
+    eclient << on1;
+
+    set_outlet(realPin, 1);
+    eclient << done1; 
+
     print_prompt();
-    return;
   }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
-
-  int realPin = pin -1;
-  realPin = outlets[realPin];
-
-
-  client->println();
-  eclient << set1;
-  client->print(pin);
-  eclient << set2;
-  eclient << on1;
-
-  set_outlet(realPin, 1);
-  eclient << done1; 
-
-  print_prompt();
-
 }
+
 
 void command_off(String args) {
 
@@ -623,37 +658,30 @@ void command_off(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
+  validatePin(pin, args);
+
+  if (validateError == true){
+    validateError = false;
     return;
   }
-  if (args.length() > 2) {
-    eclient << error_2;
+  else {
+
+    int realPin = pin -1;
+    realPin = outlets[realPin];
+
+
+    client->println();
+    eclient << set1;
+    client->print(pin);
+    eclient << set2;
+    eclient << off1;
+    set_outlet(realPin, 2);
+    eclient << done1;  
     print_prompt();
-    return;  
   }
-
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
-    print_prompt();
-    return;
-  }
-
-  int realPin = pin -1;
-  realPin = outlets[realPin];
-
-
-  client->println();
-  eclient << set1;
-  client->print(pin);
-  eclient << set2;
-  eclient << off1;
-  set_outlet(realPin, 2);
-  eclient << done1;  
-  print_prompt();
 
 }
+
 
 void command_reboot(String args) {
 
@@ -661,35 +689,26 @@ void command_reboot(String args) {
   // we do need to get both chars though because it can be 2 digits
   int pin = atoi(&args[0]);
 
-  if (args.length() <= 0) {
-    eclient << error_1;
-    print_prompt();
-    return;
-  }
-  if (args.length() > 2) {
-    eclient << error_2;
-    print_prompt();
+  validatePin(pin, args);
+  if (validateError == true){
+    validateError = false;
     return;
   }
 
-  if (pin > numOfOutlets || pin < 1) {
-    eclient << error_3;
+  else {
+    int realPin = pin -1;
+    realPin = outlets[realPin];
+
+    client->println();
+    eclient << reboot1;
+    client->print(pin);
+    eclient << reboot2;
+    client->print(rebootDelay);
+    eclient << reboot3;
+    set_outlet(realPin, 3);
+    eclient << done1;
     print_prompt();
-    return;
   }
-
-  int realPin = pin -1;
-  realPin = outlets[realPin];
-
-  client->println();
-  eclient << reboot1;
-  client->print(pin);
-  eclient << reboot2;
-  client->print(rebootDelay);
-  eclient << reboot3;
-  set_outlet(realPin, 3);
-  eclient << done1;
-  print_prompt();
 }
 
 
@@ -724,19 +743,21 @@ void set_outlet(int pin, int power_req) {
     break;
 
     //reboot
-    //FIX: change from delay to something else so other tasks dont pause (such as status light)
+    //FIX: change from delay to something else so other tasks dont pause (such as status light, sensor updates, etc)
   case 3:
     {
       if (relayType == 0) {
         digitalWrite(pin, LOW);
-        delay(rebootDelay);
+        delay (rebootDelay);
         digitalWrite(pin, HIGH);
+
       }
 
       else {
         digitalWrite(pin, HIGH);
-        delay(rebootDelay);
+        delay (rebootDelay);
         digitalWrite(pin, LOW);
+
       }
     }
     break;
@@ -823,7 +844,7 @@ void command_info(String args) {
   client->print(_VERSION);
   client->println();
 
-  //ip addr
+  //ip address
   eclient << info4;
   client->print(ip[0]);
   eclient << info5;
@@ -881,11 +902,11 @@ void command_info(String args) {
 
   //volt sensor
   eclient << info13;
-  client->println();
+  client->println(Vrms);
 
   //amp sensor
   eclient << info14;
-  client->println();
+  client->println(Irms);
 
   //humid/temp sensors
   eclient << info15;
@@ -921,7 +942,6 @@ void command_quit(String args) {
 }
 
 
-
 //user wanted to reset controller
 void command_reset(String args) {
   client->println();
@@ -938,6 +958,7 @@ void command_reset(String args) {
 
 
 }
+
 
 //This bit from http://www.faludi.com/itp/arduino/Arduino_Available_RAM_Test.pde :
 // this function will return the number of bytes currently free in RAM
@@ -986,8 +1007,9 @@ void controlLCDBacklight() {
     }
   }
 
+
   //Check if backlight is on and if the timeout has been reached. 
-  if(backlight == true){
+  if(backlight == true && lcdTimeout != 0){
     unsigned long currentMillis = millis();
     if(currentMillis - previousMillisLCD > lcdTimeout) {
       lcdSerial.write(18);
@@ -1015,7 +1037,6 @@ void writeLCD() {
     //display volt/amp
     if (lcdCounter == 0 ) {
 
-
       //FIX: make real data go to the lcd:
       lcdSerial.write(12);                 // Clear    
       delay(5);                            // Required delay
@@ -1024,7 +1045,7 @@ void writeLCD() {
       lcdSerial.print("000.0"); 
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd2;  
-      lcdSerial.print("00.0");
+      lcdSerial.print(Irms);
 
 
       lcdCounter++;
@@ -1039,10 +1060,11 @@ void writeLCD() {
       delay(5);                  // Required delay
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd3;
-      lcdSerial.write(dtostrf(sensorData[0],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[0],2,0,dtostrfbuffer1));
+      lcdSerial.write("%");
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd6;
-      lcdSerial.write(dtostrf(sensorData[1],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[1],4,1,dtostrfbuffer1));
 
       lcdCounter++;
       previousMillisLCDT = millis();
@@ -1056,10 +1078,11 @@ void writeLCD() {
       delay(5);                  // Required delay
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd4;
-      lcdSerial.write(dtostrf(sensorData[2],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[2],2,0,dtostrfbuffer1));
+      lcdSerial.write("%");
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd7;
-      lcdSerial.write(dtostrf(sensorData[3],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[3],4,1,dtostrfbuffer1));
 
       lcdCounter++;
       previousMillisLCDT = millis();
@@ -1073,10 +1096,11 @@ void writeLCD() {
       delay(5);                  // Required delay
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd5;
-      lcdSerial.write(dtostrf(sensorData[4],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[4],2,0,dtostrfbuffer1));
+      lcdSerial.write("%");
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd8;
-      lcdSerial.write(dtostrf(sensorData[5],5,2,dtostrfbuffer1));
+      lcdSerial.write(dtostrf(sensorData[5],4,1,dtostrfbuffer1));
 
       lcdCounter++;
       previousMillisLCDT = millis();
@@ -1090,9 +1114,8 @@ void writeLCD() {
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd9; 
       lcdSerial.write(148);      // line 1 pos 0
-      
-      //commented out due to lack of memory
-/*
+
+
       //following bit from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1294011483
       int days=0;
       long hours=0;
@@ -1102,9 +1125,9 @@ void writeLCD() {
       mins=secs/60; //convert seconds to minutes
       hours=mins/60; //convert minutes to hours
       days=hours/24; //convert hours to days
-      secs=secs-(mins*60); //subtract the coverted seconds to minutes in order to display 59 secs max
-      mins=mins-(hours*60); //subtract the coverted minutes to hours in order to display 59 minutes max
-      hours=hours-(days*24); //subtract the coverted hours to days in order to display 23 hours max
+      secs=secs-(mins*60); //subtract the converted seconds to minutes in order to display 59 secs max
+      mins=mins-(hours*60); //subtract the converted minutes to hours in order to display 59 minutes max
+      hours=hours-(days*24); //subtract the converted hours to days in order to display 23 hours max
 
       lcdSerial.write(dtostrf(days,2,0,dtostrfbuffer1)); //max uptime is about 50 days, so dont do more then 2 chars
       lcdSerial.write("Days ");
@@ -1115,7 +1138,7 @@ void writeLCD() {
       lcdSerial.write(":");
       lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
 
-*/
+      //since this is the last screen, reset the counter to start over
       lcdCounter=0;
       previousMillisLCDT = millis();
 
@@ -1123,8 +1146,6 @@ void writeLCD() {
 
   }
 }
-
-
 
 
 void updateSensors() {
@@ -1203,7 +1224,7 @@ int checkDHT11(int sensorNumber) {
   case 0:
     { 
 
-      //get the humidiy
+      //get the humidity
       sensorData[startNum] = DHT11.humidity;
 
       //if user wanted f instead of c, convert
@@ -1223,16 +1244,35 @@ int checkDHT11(int sensorNumber) {
     //invalid data. put impossible numbers into vars
   default: 
     {
-      sensorData[startNum] = 999.99;
-      sensorData[secondNum] = 999.99;
+      sensorData[startNum] =  999;
+      sensorData[secondNum] = 999.9;
       break;
     }
   }
 
 }
 
+//here is a function to validate the pin input the user requested
+void validatePin(int pin, String args){
+  if (args.length() <= 0) {
+    eclient << error_1;
+    print_prompt();
+    validateError=true;
+  }	
 
+  if (args.length() > 2) {
+    eclient << error_2;
+    print_prompt();
+    validateError=true;
+  }
 
+  if (pin > numOfOutlets || pin < 1) {
+    eclient << error_3;
+    print_prompt();
+    validateError=true;
+  }
+
+}
 
 
 
