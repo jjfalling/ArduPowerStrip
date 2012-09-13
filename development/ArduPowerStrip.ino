@@ -109,10 +109,10 @@ boolean debug = true;
 #include <avr/wdt.h>
 #include <SoftwareSerial.h>
 #include <dht11.h>
-#include "EmonLib.h"                   // Include Emon Library
+#include <EmonLib.h>
 
-EnergyMonitor emon1;                   // Create an instance
-
+ // Create an instance
+EnergyMonitor emon1;                  
 
 //tell the dht lib we are using a DHT11
 dht11 DHT11;
@@ -1030,9 +1030,6 @@ void writeLCD() {
 
     //display volt/amp
     if (lcdCounter == 0 ) {
-
-
-      Irms = emon1.calcIrms(1480);  // Calculate Irms only
 
       //FIX: make real data go to the lcd:
       lcdSerial.write(12);                 // Clear    
