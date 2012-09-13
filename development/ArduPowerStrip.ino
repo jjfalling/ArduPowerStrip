@@ -115,17 +115,18 @@ boolean debug = true;
 #include <dht11.h>
 #include <EmonLib.h>
 
+//program name and version
+#define _NAME "ArduPowerStrip"
+#define _VERSION "0.3"
+
  // Create an instance
 EnergyMonitor emon1;                  
 
 //Define the dht instance (I think?)
 dht11 DHT11;
 
+//define software serial for the lcd
 SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
-
-//program name and version
-#define _NAME "ArduPowerStrip"
-#define _VERSION "0.3"
 
 //disable watchdog, this is needed on newer chips to prevent a reboot loop. However I can't test this...
 void wdt_init(void)
