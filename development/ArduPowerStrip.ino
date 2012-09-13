@@ -257,6 +257,7 @@ FLASH_STRING(lcd8,"Temp3:     ");
 FLASH_STRING(lcd9,"     Uptime:");
 
 double Irms;
+double Vrms;
 
 //end of global section
 //########################## 
@@ -476,6 +477,7 @@ void loop() {
 
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
+  Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 }
 
