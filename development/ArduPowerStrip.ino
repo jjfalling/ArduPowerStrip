@@ -361,6 +361,8 @@ void setup() {
   lcdSerial.write("       ");      //as the version changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
 
+
+  //update voltage and amperage data
   emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
@@ -478,7 +480,7 @@ void loop() {
 
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
-  Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+ // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 }
 
