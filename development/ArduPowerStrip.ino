@@ -21,8 +21,8 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -add snmp support
  -up/down arrows
  
- -add amp/volt reporting (with option of using lcd display) - v3
- -add temp/humid sensing (int and ext sensors) - v3
+ -add volt reporting (with option of using lcd display) - v3
+
  
  */
 
