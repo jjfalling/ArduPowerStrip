@@ -86,8 +86,8 @@ const long lcdTimeout = 0 ;
 boolean tempF = true;
 
 //Set Voltage and current input pins
-int inPinV = 4;
-int inPinI = 5;
+int voltSensorPin = 4;
+int ampSensorPin = 5;
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
@@ -110,6 +110,7 @@ boolean debug = true;
 #include <SoftwareSerial.h>
 #include <dht11.h>
 #include "EmonLib.h"                   // Include Emon Library
+
 EnergyMonitor emon1;                   // Create an instance
 
 
@@ -360,8 +361,8 @@ void setup() {
   lcdSerial.write("       ");      //as the version changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
 
-  emon1.voltage(A4, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(A5, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
+  emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
+  emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
 }
 
