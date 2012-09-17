@@ -257,9 +257,9 @@ FLASH_STRING(connect2,"\nOnly one user can connect at a time.\nClosing connectio
 FLASH_STRING(connect3,"Second user tried to connect");
 FLASH_STRING(lcd1,"Volts:     ");
 FLASH_STRING(lcd2,"Amps:       ");
-FLASH_STRING(lcd3,"Humid I:   ");
-FLASH_STRING(lcd4,"Humid E1:  ");
-FLASH_STRING(lcd5,"Humid E2:  ");
+FLASH_STRING(lcd3,"Humid I:    ");
+FLASH_STRING(lcd4,"Humid E1:   ");
+FLASH_STRING(lcd5,"Humid E2:   ");
 FLASH_STRING(lcd6,"Temp I:    ");
 FLASH_STRING(lcd7,"Temp E1:   ");
 FLASH_STRING(lcd8,"Temp E2:   ");
