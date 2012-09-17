@@ -72,7 +72,7 @@ const int  buttonPin = 3;
 //What pin is the lcd serial pin connected to?
 const int lcdTxPin = 5;
 
-//What pin is the factory default button connected to?
+//What pin is the "factory default" button connected to?
 const int defaultPin = 6;
 
 //How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
