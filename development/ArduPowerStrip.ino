@@ -51,11 +51,11 @@ const char hostname[] = "APS-rpc1";
 // are off when set to low while others are on while set to low. You many need to play with this.
 // To try an make this more simple, here is a guide for if your relay is set to NO or NC:
 //NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high, 0 is off=pin low
-const boolean relayType = 1;    
+const boolean relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = { 
-  A0,A1,A2,A3};
+  A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 const int rebootDelay = 3000; 
@@ -71,6 +71,9 @@ const int  buttonPin = 3;
 
 //What pin is the lcd serial pin connected to?
 const int lcdTxPin = 5;
+
+//What pin is the factory default button connected to?
+const int defaultPin = 6;
 
 //How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
 const long lcdTimeout = 600000 ;
@@ -220,7 +223,7 @@ FLASH_STRING(error_5,"ERR: Syntax error please use a valid command\n");
 FLASH_STRING(set1,"Setting outlet ");
 FLASH_STRING(set2," to ");
 FLASH_STRING(off1,"OFF\n");
-FLASH_STRING(on1,"OFF\n");
+FLASH_STRING(on1,"ON\n");
 FLASH_STRING(reboot1,"Rebooting outlet ");
 FLASH_STRING(reboot2,", please wait about ");
 FLASH_STRING(reboot3," ms.\n");
