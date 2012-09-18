@@ -429,6 +429,7 @@ void loop() {
           command += String(ch);
         }
       }
+      
 
       //Blink status led while there is an active telnet session
       //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
