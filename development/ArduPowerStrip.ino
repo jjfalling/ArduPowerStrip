@@ -22,7 +22,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -up/down arrows
  
  -add volt reporting (with option of using lcd display) - v3
-
+ 
  
  */
 
@@ -122,7 +122,7 @@ boolean debug = true;
 #define _NAME "ArduPowerStrip"
 #define _VERSION "0.3"
 
- // Create an instance
+// Create an instance
 EnergyMonitor emon1;                  
 
 //Define the dht instance (I think?)
@@ -446,13 +446,19 @@ void loop() {
       }
 
 
-      //following functions are so the backlight and sensors continue to work while a session is active
       //control lcd backlight
       controlLCDBacklight();
+
       //update sensors
       updateSensors();
+
       //write data to lcd
       writeLCD();
+
+      //update power usage
+      Irms = emon1.calcIrms(1480);  // Calculate Irms only
+      // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+
 
     }
 
@@ -488,8 +494,8 @@ void loop() {
 
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
- // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
- 
+  // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+
 
 }
 
@@ -1281,6 +1287,7 @@ void validatePin(int pin, String args){
   }
 
 }
+
 
 
 
