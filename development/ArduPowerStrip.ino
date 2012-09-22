@@ -1147,19 +1147,19 @@ void writeLCD() {
       lcdSerial.write("Days ");
 
       //if hours < 10 then prepend 0
-      if ( (hours < 10 ) {
+      if (hours < 10 ) {
         lcdSerial.write("0");
       }
       lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
       lcdSerial.write(":");
       //if mins < 10 then prepend 0
-      if ( (mins < 10 ) {
+      if (mins < 10 ) {
         lcdSerial.write("0");
       }
       lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
       lcdSerial.write(":");
       //if secs < 10 then prepend 0
-      if ( (secs < 10 ) {
+      if (secs < 10 ) {
         lcdSerial.write("0");
       }
       lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
