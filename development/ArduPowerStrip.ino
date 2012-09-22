@@ -431,6 +431,8 @@ void setup() {
           lcdSerial << rest7;
           lcdSerial.write(148);               // line 1 pos 0
           lcdSerial << rest8;
+          
+          delay(4000)
       }
 
       if(currentMillis - previousMillisSensor > 2400) {
