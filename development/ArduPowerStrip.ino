@@ -425,35 +425,30 @@ void setup() {
       if(currentMillis - previousMillisSensor > 2000) {
         previousMillisSensor = millis();
 
-        if (resetMessage == 0) {
+        switch (resetMessage) {
 
-        //case 0:
+        case 0:
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest1;
           lcdSerial.write(148);               // line 1 pos 0
           lcdSerial << rest2;
           resetMessage = 1;
-        }
 
-        if (resetMessage == 1) {
-       // case 1:
+        case 1:
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest3;
           lcdSerial.write(148);               // line 1 pos 0
           lcdSerial << rest4;
           resetMessage = 2;
-        }
 
-        if (resetMessage == 2) {
-       // case 2:
+        case 2:
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest5;
           lcdSerial.write(148);               // line 1 pos 0
           lcdSerial << rest6;
           resetMessage = 0;
-        }
 
-        //}
+        }
       }
     }
   }
