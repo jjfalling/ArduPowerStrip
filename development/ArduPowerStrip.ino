@@ -36,7 +36,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
 
 //Network info
 byte mac[] = { 
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+  0xDE, 0xAD, 0xFE, 0xAB, 0xFE, 0xED };
 byte ip[] =   { 
   192,  168,  15, 17 };
 byte gateway[] = { 
@@ -94,24 +94,22 @@ boolean tempF = true;
 //What pin are you using to sense voltage?
 #define voltSensorPin 4
 
-//What pin are you using to sense voltage?
-#define voltage 120
+//What voltage in the ac line?
+#define acVoltage 120
 
-//What pin are you using to sense voltage?
-#define phaseShift 1.7
-
-//What pin are you using to sense amperage?
-#define ampSensorPin 5
+//What is your phase shift?
+#define voltphaseShift 1.7
 
 //What pin are you using to sense amperage?
 #define ampSensorPin 5
+
+//What amperage calibration?
+#define ampCalibration 5
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
 
-  //update voltage and amperage data 
-  emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm 
+
 //################## 
 //End user settings
 //################## 
@@ -386,8 +384,8 @@ void setup() {
 
 
   //update voltage and amperage data 
-  emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
-  emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
+  emon1.voltage(voltSensorPin, acVoltage, voltphaseShift);  // Voltage: input pin, calibration, phase_shift
+  emon1.current(ampSensorPin, ampCalibration);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm 
 
 }
 
