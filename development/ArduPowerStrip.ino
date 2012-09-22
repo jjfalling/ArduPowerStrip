@@ -104,7 +104,7 @@ const int outlets[] = {
 #define ampSensorPin 5
 
 //What amperage calibration?
-#define ampCalibration 5
+#define ampCalibration 29
 
 //FIX rm this: Enable serial debug? 
 #define debug true
