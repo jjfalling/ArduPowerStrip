@@ -394,7 +394,7 @@ void setup() {
 
     lcdSerial.write(12);                // Clear 
  
-    foovar = 0;
+    int foovar = 0;
     int resetMessage = 0;
     while(foovar < 200){
     
