@@ -341,22 +341,14 @@ void setup() {
   Serial << boot5;
 
 
-  com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help        };
-  com[1]=(Command){
-    "INFO", "Shows system information", command_info        };
-  com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status        };
-  com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on        };
-  com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off        };
-  com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot        };
-  com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit        };
-  com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset        };
+  com[0]=(Command){"HELP", "Prints this. Try HELP <CMD> for more", command_help};
+  com[1]=(Command){"INFO", "Shows system information", command_info};
+  com[2]=(Command){"STATUS", "Shows the status of a outlet", command_status};
+  com[3]=(Command){"ON", "Sets an outlet to on", command_on};
+  com[4]=(Command){"OFF", "Sets an outlet to off", command_off};
+  com[5]=(Command){"REBOOT", "Reboots an outlet", command_reboot};
+  com[6]=(Command){"QUIT", "Quits this session gracefully", command_quit};
+  com[7]=(Command){"RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
