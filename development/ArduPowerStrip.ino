@@ -849,7 +849,7 @@ void command_help(String args) {
 void command_info(String args) {
   // this command spits out the info messages
 
-    client->println();
+  client->println();
 
   eclient << info_string;
   client->println();
@@ -1213,11 +1213,7 @@ void updateSensors() {
       previousMillisSensor = millis();
 
     }
-
   }
-
-
-
 }
 
 
