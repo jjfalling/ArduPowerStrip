@@ -65,7 +65,7 @@ const int rebootDelay = 3000;
 const long telnetTimeout = 300000;
 
 //What pin is the statusLED connected to?
-#define statusLED 2;
+#define statusLED 2
 
 // What pin is the lcd backlight button connected to?
 const int  buttonPin = 3;
