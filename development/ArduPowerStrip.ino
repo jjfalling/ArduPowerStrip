@@ -986,6 +986,7 @@ void command_reset(String args) {
 }
 
 
+
 //This bit from http://www.faludi.com/itp/arduino/Arduino_Available_RAM_Test.pde :
 // this function will return the number of bytes currently free in RAM
 int memoryTest() {
@@ -1049,6 +1050,7 @@ void controlLCDBacklight() {
   }  
 
 }
+
 
 
 void writeLCD() {
@@ -1192,6 +1194,7 @@ void writeLCD() {
     }
   }
 }
+
 
 
 void updateSensors() {
