@@ -1146,6 +1146,10 @@ void writeLCD() {
       lcdSerial.write(dtostrf(days,2,0,dtostrfbuffer1)); //max uptime is about 50 days, so dont do more then 2 chars
       lcdSerial.write("Days ");
 
+      //if hours < 10 then prepend 0
+      if ( (hours < 10 ) {
+        lcdSerial.write("0");
+      }
       lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
       lcdSerial.write(":");
       //if mins < 10 then prepend 0
