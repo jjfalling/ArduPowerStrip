@@ -411,7 +411,7 @@ void setup() {
       
       unsigned long currentMillis = millis();
 
-      if(currentMillis - previousMillisSensor > 1000) {
+      if(currentMillis - previousMillisSensor > 2000) {
         previousMillisSensor = millis();
 
         switch (resetMessage) {
