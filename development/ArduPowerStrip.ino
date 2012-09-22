@@ -399,10 +399,9 @@ void setup() {
     while(foovar < 200){
       
     unsigned long previousMillisSensor = millis();
-    
     unsigned long currentMillis = millis();
     
-    if(currentMillis - previousMillisSensor > 2000) {
+    if(currentMillis - previousMillisSensor > 1000) {
     previousMillisSensor = millis();
     
     switch (resetMessage) {
