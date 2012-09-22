@@ -392,6 +392,8 @@ void setup() {
   // if the resetSwitch is LOW restore password and tcp parameters todefaul values
   if ( digitalRead( defaultPin ) == LOW ) { 
     
+    delay(1000);
+    
     Serial.println("Default button pressed");
       
     unsigned long previousMillisSensor = 0;
