@@ -1,4 +1,4 @@
- /*
+/*
 ARDUPOWERSTRIP - JJFALLING ©2012
  https://github.com/jjfalling/ArduPowerStrip
  Published under GNU GPL.
@@ -54,7 +54,8 @@ const char hostname[] = "APS-rpc1";
 const boolean relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
-const int outlets[] = {A0,A1,A2};
+const int outlets[] = {
+  A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 #define rebootDelay 3000
@@ -316,21 +317,21 @@ void setup() {
 
 
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help};
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info};
+    "INFO", "Shows system information", command_info  };
   com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status};
+    "STATUS", "Shows the status of a outlet", command_status  };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on};
+    "ON", "Sets an outlet to on", command_on  };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off};
+    "OFF", "Sets an outlet to off", command_off  };
   com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot};
+    "REBOOT", "Reboots an outlet", command_reboot  };
   com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit};
+    "QUIT", "Quits this session gracefully", command_quit  };
   com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -369,7 +370,7 @@ void setup() {
   lcdSerial.write(_VERSION); 
 
 
-//FIX make the rest of this vars
+  //FIX make the rest of this vars
   //update voltage and amperage data 
   emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
@@ -429,7 +430,7 @@ void loop() {
           command += String(ch);
         }
       }
-      
+
 
       //Blink status led while there is an active telnet session
       //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
@@ -456,7 +457,7 @@ void loop() {
       //write data to lcd
       writeLCD();
 
-//FIX: calculating the power causes the prompt to freeze for about 2 seconds...
+      //FIX: calculating the power causes the prompt to freeze for about 2 seconds...
 
       //update power usage
       Irms = emon1.calcIrms(1480);  // Calculate Irms only
@@ -494,7 +495,7 @@ void loop() {
 
   //write data to lcd
   writeLCD();
-  
+
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
   Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
@@ -1171,7 +1172,7 @@ void writeLCD() {
       else {
         lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
       }
-      
+
       //since this is the last screen, reset the counter to start over
       lcdCounter=0;
       previousMillisLCDT = millis();
@@ -1310,6 +1311,7 @@ void validatePin(int pin, String args){
   }
 
 }
+
 
 
 
