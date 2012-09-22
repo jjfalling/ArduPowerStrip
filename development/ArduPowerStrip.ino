@@ -1,4 +1,4 @@
-/*
+ /*
 ARDUPOWERSTRIP - JJFALLING ©2012
  https://github.com/jjfalling/ArduPowerStrip
  Published under GNU GPL.
@@ -23,6 +23,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  
  -add volt reporting (with option of using lcd display) - v3
  
+ -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc)
  
  */
 
@@ -44,6 +45,7 @@ byte gateway[] = {
 byte subnet[] = { 
   255, 255, 255, 0 };
 
+
 //Hostname
 const char hostname[] = "APS-rpc1";
 
@@ -54,8 +56,7 @@ const char hostname[] = "APS-rpc1";
 const boolean relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
-const int outlets[] = { 
-  A0,A1,A2};
+const int outlets[] = {A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
 const int rebootDelay = 3000; 
@@ -370,7 +371,8 @@ void setup() {
   lcdSerial.write(_VERSION); 
 
 
-  //update voltage and amperage data
+//FIX make the rest of this vars
+  //update voltage and amperage data 
   emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
@@ -456,9 +458,11 @@ void loop() {
       //write data to lcd
       writeLCD();
 
+//FIX: calculating the power causes the prompt to freeze for about 2 seconds...
+
       //update power usage
       Irms = emon1.calcIrms(1480);  // Calculate Irms only
-      // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+      Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 
     }
@@ -492,10 +496,10 @@ void loop() {
 
   //write data to lcd
   writeLCD();
-
+  
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
-  // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+  Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 
 }
@@ -1054,7 +1058,7 @@ void writeLCD() {
       delay(5);                            // Required delay
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd1;
-      lcdSerial.print("000.0"); 
+      lcdSerial.print(Vrms); 
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd2;  
       lcdSerial.print(Irms);
