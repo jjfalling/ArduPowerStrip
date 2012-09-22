@@ -68,7 +68,7 @@ const int outlets[] = {
 #define statusLED 2
 
 // What pin is the lcd backlight button connected to?
-#define buttonPin 3
+#define lcdButtonPin 3
 
 //What pin is the lcd serial pin connected to?
 #define lcdTxPin 5
@@ -362,7 +362,7 @@ void setup() {
   pinMode(statusLED, OUTPUT);
 
   // initialize the button pin as a input:
-  pinMode(buttonPin, INPUT);
+  pinMode(lcdButtonPin, INPUT);
   pinMode(lcdTxPin, OUTPUT);
   digitalWrite(lcdTxPin, HIGH);  //parallax uses this in their example, so I assume its required...
 
@@ -422,6 +422,10 @@ void setup() {
       
       unsigned long currentMillis = millis();
 
+      // read the current state of the button
+      buttonState = digitalRead(lcdButtonPin);
+
+
       if(currentMillis - previousMillisSensor > 2400) {
         previousMillisSensor = millis();
 
@@ -456,6 +460,7 @@ void setup() {
         }
         
       }
+      
     }
   }
 
@@ -1103,7 +1108,7 @@ void controlLCDBacklight() {
 
 
   // read the current state of the button
-  buttonState = digitalRead(buttonPin);
+  buttonState = digitalRead(lcdButtonPin);
 
   // if the button was pushed and the backlight is off, turn the light on
   if (buttonState == HIGH && backlight == false) {
@@ -1112,7 +1117,7 @@ void controlLCDBacklight() {
 
     //keep screen from flickering 
     while (buttonState == HIGH){
-      buttonState = digitalRead(buttonPin);
+      buttonState = digitalRead(lcdButtonPin);
     }
   } 
 
@@ -1123,7 +1128,7 @@ void controlLCDBacklight() {
 
     //keep screen from flickering 
     while (buttonState == HIGH){
-      buttonState = digitalRead(buttonPin);
+      buttonState = digitalRead(lcdButtonPin);
     }
   }
 
