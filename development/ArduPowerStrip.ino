@@ -391,6 +391,8 @@ void setup() {
 
   // if the resetSwitch is LOW restore password and tcp parameters todefaul values
   if ( digitalRead( defaultPin ) == LOW ) { 
+    
+    Serial.println("Default button pressed");
 
     lcdSerial.write(12);                // Clear 
 
