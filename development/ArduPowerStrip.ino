@@ -1149,21 +1149,29 @@ void writeLCD() {
       //if hours < 10 then prepend 0
       if (hours < 10 ) {
         lcdSerial.write("0");
+        lcdSerial.write(dtostrf(hours,1,0,dtostrfbuffer1));
       }
-      lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
+      else {
+        lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
+      }
       lcdSerial.write(":");
       //if mins < 10 then prepend 0
       if (mins < 10 ) {
         lcdSerial.write("0");
+        lcdSerial.write(dtostrf(mins,1,0,dtostrfbuffer1));
       }
-      lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
+      else {
+        lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
+      }
       lcdSerial.write(":");
       //if secs < 10 then prepend 0
       if (secs < 10 ) {
         lcdSerial.write("0");
       }
-      lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
-
+      else {
+        lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
+      }
+      
       //since this is the last screen, reset the counter to start over
       lcdCounter=0;
       previousMillisLCDT = millis();
