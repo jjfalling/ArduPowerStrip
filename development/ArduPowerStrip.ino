@@ -92,7 +92,7 @@ const long lcdTimeout = 600000 ;
 boolean tempF = true;
 
 //What pin are you using to sense voltage?
-int voltSensorPin = 4;
+#define voltSensorPin = 4;
 
 //What pin are you using to sense amperage?
 int ampSensorPin = 5;
