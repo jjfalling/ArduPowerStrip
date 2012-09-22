@@ -278,6 +278,15 @@ FLASH_STRING(lcd7,"Temp E1:   ");
 FLASH_STRING(lcd8,"Temp E2:   ");
 FLASH_STRING(lcd9,"     Uptime:");
 
+FLASH_STRING(rest1,"Default? press");
+FLASH_STRING(rest2,"LCD button to");
+FLASH_STRING(rest3,"default settings");
+FLASH_STRING(rest4,"or reset device");
+FLASH_STRING(rest5,"to cancel and");
+FLASH_STRING(rest6,"boot normally");
+FLASH_STRING(rest7,"Defaulting all");
+FLASH_STRING(rest8,"settings...");
+
 double Irms;
 double Vrms;
 
