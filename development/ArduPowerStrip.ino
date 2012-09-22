@@ -46,7 +46,7 @@ byte subnet[] = {
 
 
 //Hostname
-#define hostname APS-rpc1
+const char hostname[] = "APS-rpc1";
 
 //You need to define the type of relay you are using or how you have it wired. Some relays
 // are off when set to low while others are on while set to low. You many need to play with this.
