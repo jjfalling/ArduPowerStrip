@@ -397,8 +397,11 @@ void setup() {
     int foovar = 0;
     int resetMessage = 0;
     while(foovar < 200){
+      
+    unsigned long previousMillisSensor = millis();
     
     unsigned long currentMillis = millis();
+    
     if(currentMillis - previousMillisSensor > 2000) {
     
     switch (resetMessage) {
@@ -408,14 +411,14 @@ void setup() {
     lcdSerial.write("Default? press");   // Turn backlight on
     lcdSerial.write(148);               // line 1 pos 0
     lcdSerial.write("LCD button to");  // Turn backlight on
-    resetMessage++
+    resetMessage++;
     
     case 1:
     lcdSerial.write(128);               // line 0 pos 0 
     lcdSerial.write("default settings");   // Turn backlight on
     lcdSerial.write(148);               // line 1 pos 0
     lcdSerial.write("or reset device");  // Turn backlight on
-    resetMessage++
+    resetMessage++;
     
     case 2:
     lcdSerial.write(128);               // line 0 pos 0 
