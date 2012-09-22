@@ -342,21 +342,21 @@ void setup() {
 
 
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help      };
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help        };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info      };
+    "INFO", "Shows system information", command_info        };
   com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status      };
+    "STATUS", "Shows the status of a outlet", command_status        };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on      };
+    "ON", "Sets an outlet to on", command_on        };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off      };
+    "OFF", "Sets an outlet to off", command_off        };
   com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot      };
+    "REBOOT", "Reboots an outlet", command_reboot        };
   com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit      };
+    "QUIT", "Quits this session gracefully", command_quit        };
   com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset      };
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset        };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -426,13 +426,19 @@ void setup() {
       lcdButtonState = digitalRead(lcdButtonPin);
 
       if (lcdButtonState == HIGH) {
-          lcdSerial.write(12);                // Clear 
-          lcdSerial.write(128);               // line 0 pos 0 
-          lcdSerial << rest7;
-          lcdSerial.write(148);               // line 1 pos 0
-          lcdSerial << rest8;
-          
-          delay(4000);
+        lcdSerial.write(12);                // Clear 
+        lcdSerial.write(128);               // line 0 pos 0 
+        lcdSerial << rest7;
+        lcdSerial.write(148);               // line 1 pos 0
+        lcdSerial << rest8;
+
+        delay(4000);
+
+        ethcl->stop();
+
+        wdt_enable(WDTO_30MS);
+        while(1) {
+        };
       }
 
       if(currentMillis - previousMillisSensor > 2400) {
@@ -1427,6 +1433,7 @@ void validatePin(int pin, String args){
     return;
   }
 }
+
 
 
 
