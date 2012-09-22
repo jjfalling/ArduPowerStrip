@@ -1227,6 +1227,7 @@ void updateSensors() {
 }
 
 
+
 //check requested sensor
 int checkDHT11(int sensorNumber) {
 
@@ -1293,6 +1294,8 @@ int checkDHT11(int sensorNumber) {
   }
 
 }
+
+
 
 //here is a function to validate the pin input the user requested
 void validatePin(int pin, String args){
