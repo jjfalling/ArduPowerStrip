@@ -433,7 +433,7 @@ void setup() {
         lcdSerial.write(148);               // line 1 pos 0
         lcdSerial << rest8;
 
-
+        //FIX: write default settings here
         delay(4000);
 
         ethcl->stop();
