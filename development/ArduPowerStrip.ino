@@ -20,6 +20,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -various items commented as fix
  -add snmp support
  -up/down arrows
+ -snmp support
  
  -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc)
  
