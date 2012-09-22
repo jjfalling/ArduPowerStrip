@@ -1168,6 +1168,7 @@ void writeLCD() {
       //if secs < 10 then prepend 0
       if (secs < 10 ) {
         lcdSerial.write("0");
+        lcdSerial.write(dtostrf(secs,1,0,dtostrfbuffer1));
       }
       else {
         lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
