@@ -427,6 +427,7 @@ void setup() {
 
         if (resetMessage == 0) {
 
+          lcdSerial.write(12);                // Clear 
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest1;
           lcdSerial.write(148);               // line 1 pos 0
@@ -436,6 +437,7 @@ void setup() {
         
         else if  (resetMessage == 1 ) {
         
+          lcdSerial.write(12);                // Clear 
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest3;
           lcdSerial.write(148);               // line 1 pos 0
@@ -445,6 +447,7 @@ void setup() {
 
         else if  (resetMessage == 2 ) {
           
+          lcdSerial.write(12);                // Clear 
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest5;
           lcdSerial.write(148);               // line 1 pos 0
