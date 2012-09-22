@@ -401,17 +401,22 @@ void setup() {
     unsigned long currentMillis = millis();
     if(currentMillis - previousMillisSensor > 2000) {
     
-      
+    switch (resetMessage) {
+    
+    case 0:
     lcdSerial.write(128);               // line 0 pos 0 
     lcdSerial.write("Default? press");   // Turn backlight on
     lcdSerial.write(148);               // line 1 pos 0
     lcdSerial.write("LCD button to");  // Turn backlight on
+    resetMessage++
     
+    case 1:
     lcdSerial.write(128);               // line 0 pos 0 
     lcdSerial.write("default settings");   // Turn backlight on
     lcdSerial.write(148);               // line 1 pos 0
     lcdSerial.write("or rst to cncl");  // Turn backlight on
     
+    }
     }
     }
   }
