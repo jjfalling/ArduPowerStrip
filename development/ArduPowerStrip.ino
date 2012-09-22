@@ -294,7 +294,7 @@ void setup() {
   if (debug) Serial << boot1;
   
   
-   pinMode(default, INPUT_PULLUP); 
+   pinMode(defaultPin, INPUT_PULLUP); 
   
   
   
