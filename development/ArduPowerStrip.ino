@@ -417,12 +417,12 @@ void setup() {
     lcdSerial.write("or reset device");  // Turn backlight on
     resetMessage++
     
-    case 1:
+    case 2:
     lcdSerial.write(128);               // line 0 pos 0 
     lcdSerial.write("to cancel and");   // Turn backlight on
     lcdSerial.write(148);               // line 1 pos 0
     lcdSerial.write("boot normally");  // Turn backlight on
-    resetMessage++
+    resetMessage = 0;
     
     }
     }
