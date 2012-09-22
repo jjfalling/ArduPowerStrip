@@ -89,7 +89,7 @@ const int outlets[] = {
 #define ext2DHT11 9
 
 //Do you want fahrenheit or celsius? True is f, false if c
-boolean tempF = true;
+#define tempF = true;
 
 //What pin are you using to sense voltage?
 #define voltSensorPin 4
