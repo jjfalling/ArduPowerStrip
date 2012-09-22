@@ -16,13 +16,13 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -allow only one session
  -on/off/reboot/status all
  -remove debug option for serial
- -various items commented as fix
  -add snmp support
  -up/down arrows/history?
  -snmp support -v5
+ -various items commented as fix -v4
  -change network/hostname over telnet? move said settings to flash. -v4/v5
  
- -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc) - v4
+ -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc). also turn into functions - v4
  
  */
 
@@ -94,13 +94,24 @@ boolean tempF = true;
 //What pin are you using to sense voltage?
 #define voltSensorPin 4
 
+//What pin are you using to sense voltage?
+#define voltage 120
+
+//What pin are you using to sense voltage?
+#define phaseShift 1.7
+
+//What pin are you using to sense amperage?
+#define ampSensorPin 5
+
 //What pin are you using to sense amperage?
 #define ampSensorPin 5
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
 
-
+  //update voltage and amperage data 
+  emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
+  emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm 
 //################## 
 //End user settings
 //################## 
@@ -374,7 +385,6 @@ void setup() {
   lcdSerial.write(_VERSION); 
 
 
-  //FIX make the rest of this vars
   //update voltage and amperage data 
   emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
