@@ -59,25 +59,25 @@ const boolean relayType = 0;
 const int outlets[] = {A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
-const int rebootDelay = 3000; 
+#define rebootDelay = 3000
 
 //How long before the telnet session times out(in milliseconds)?
-const long telnetTimeout = 300000;
+#define telnetTimeout 300000
 
 //What pin is the statusLED connected to?
 #define statusLED 2
 
 // What pin is the lcd backlight button connected to?
-const int  buttonPin = 3;
+#define buttonPin 3
 
 //What pin is the lcd serial pin connected to?
-const int lcdTxPin = 5;
+#define lcdTxPin 5
 
 //What pin is the "factory default" button connected to?
-const int defaultPin = 6;
+#define defaultPin 6
 
 //How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
-const long lcdTimeout = 600000 ;
+#define lcdTimeout 600000
 
 //What pin is the internal humid/temp (dht11) sensor on?
 #define intDHT11 7
