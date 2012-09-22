@@ -121,7 +121,7 @@ boolean debug = true;
 
 //program name and version
 #define _NAME "ArduPowerStrip"
-#define _VERSION "0.3"
+#define _VERSION "0.4"
 
 // Create an instance
 EnergyMonitor emon1;                  
