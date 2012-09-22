@@ -333,21 +333,21 @@ void setup() {
 
 
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help    };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info  };
+    "INFO", "Shows system information", command_info    };
   com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status  };
+    "STATUS", "Shows the status of a outlet", command_status    };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on  };
+    "ON", "Sets an outlet to on", command_on    };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off  };
+    "OFF", "Sets an outlet to off", command_off    };
   com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot  };
+    "REBOOT", "Reboots an outlet", command_reboot    };
   com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit  };
+    "QUIT", "Quits this session gracefully", command_quit    };
   com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset    };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -388,50 +388,50 @@ void setup() {
 
 
   pinMode(defaultPin, INPUT_PULLUP); 
-  
+
   // if the resetSwitch is LOW restore password and tcp parameters todefaul values
   if ( digitalRead( defaultPin ) == LOW ) { 
 
     lcdSerial.write(12);                // Clear 
- 
+
     int foovar = 0;
     int resetMessage = 0;
     while(foovar < 200){
-      
-    unsigned long previousMillisSensor = millis();
-    unsigned long currentMillis = millis();
-    
-    if(currentMillis - previousMillisSensor > 1000) {
-    previousMillisSensor = millis();
-    
-    switch (resetMessage) {
-    
-    case 0:
-    lcdSerial.write(128);               // line 0 pos 0 
-    lcdSerial.write("Default? press");   // Turn backlight on
-    lcdSerial.write(148);               // line 1 pos 0
-    lcdSerial.write("LCD button to");  // Turn backlight on
-    resetMessage++;
-    
-    case 1:
-    lcdSerial.write(128);               // line 0 pos 0 
-    lcdSerial.write("default settings");   // Turn backlight on
-    lcdSerial.write(148);               // line 1 pos 0
-    lcdSerial.write("or reset device");  // Turn backlight on
-    resetMessage++;
-    
-    case 2:
-    lcdSerial.write(128);               // line 0 pos 0 
-    lcdSerial.write("to cancel and");   // Turn backlight on
-    lcdSerial.write(148);               // line 1 pos 0
-    lcdSerial.write("boot normally");  // Turn backlight on
-    resetMessage = 0;
-    
-    }
-    }
+
+      unsigned long previousMillisSensor = millis();
+      unsigned long currentMillis = millis();
+
+      if(currentMillis - previousMillisSensor > 1000) {
+        previousMillisSensor = millis();
+
+        switch (resetMessage) {
+
+        case 0:
+          lcdSerial.write(128);               // line 0 pos 0 
+          lcdSerial.write("Default? press");   // Turn backlight on
+          lcdSerial.write(148);               // line 1 pos 0
+          lcdSerial.write("LCD button to");  // Turn backlight on
+          resetMessage++;
+
+        case 1:
+          lcdSerial.write(128);               // line 0 pos 0 
+          lcdSerial.write("default settings");   // Turn backlight on
+          lcdSerial.write(148);               // line 1 pos 0
+          lcdSerial.write("or reset device");  // Turn backlight on
+          resetMessage++;
+
+        case 2:
+          lcdSerial.write(128);               // line 0 pos 0 
+          lcdSerial.write("to cancel and");   // Turn backlight on
+          lcdSerial.write(148);               // line 1 pos 0
+          lcdSerial.write("boot normally");  // Turn backlight on
+          resetMessage = 0;
+
+        }
+      }
     }
   }
-  
+
 
 
 
@@ -923,7 +923,7 @@ void command_help(String args) {
 void command_info(String args) {
   // this command spits out the info messages
 
-  client->println();
+    client->println();
   eclient << info_string;
   client->println();
   eclient << info1;
@@ -1389,6 +1389,7 @@ void validatePin(int pin, String args){
     return;
   }
 }
+
 
 
 
