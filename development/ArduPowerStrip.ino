@@ -443,9 +443,9 @@ void setup() {
 
         case 2:
           lcdSerial.write(128);               // line 0 pos 0 
-          lcdSerial << rest6;
+          lcdSerial << rest5;
           lcdSerial.write(148);               // line 1 pos 0
-          lcdSerial << rest7;
+          lcdSerial << rest6;
           resetMessage = 0;
 
         }
