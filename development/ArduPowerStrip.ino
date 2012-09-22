@@ -399,7 +399,7 @@ void setup() {
     lcdSerial.write(12);                // Clear 
 
     int foovar = 0;
-    int resetMessage = 1;
+    int resetMessage = 0;
     
 //    lcdSerial.write(128);               // line 0 pos 0 
 //    lcdSerial.write("Default? press");   // Turn backlight on
