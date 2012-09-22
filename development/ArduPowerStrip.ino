@@ -52,7 +52,7 @@ const char hostname[] = "APS-rpc1";
 // are off when set to low while others are on while set to low. You many need to play with this.
 // To try an make this more simple, here is a guide for if your relay is set to NO or NC:
 //NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high, 0 is off=pin low
-const boolean relayType = 0;    
+#define relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
 const int outlets[] = {
