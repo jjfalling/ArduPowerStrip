@@ -92,10 +92,10 @@ const int outlets[] = {A0,A1,A2};
 boolean tempF = true;
 
 //What pin are you using to sense voltage?
-int voltSensorPin = 4;
+#define voltSensorPin 4
 
 //What pin are you using to sense amperage?
-int ampSensorPin = 5;
+#define ampSensorPin 5
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
