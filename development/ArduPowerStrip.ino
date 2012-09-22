@@ -65,7 +65,7 @@ const int rebootDelay = 3000;
 const long telnetTimeout = 300000;
 
 //What pin is the statusLED connected to?
-const int statusLED =  2;
+#define statusLED 2;
 
 // What pin is the lcd backlight button connected to?
 const int  buttonPin = 3;
@@ -92,7 +92,7 @@ const long lcdTimeout = 600000 ;
 boolean tempF = true;
 
 //What pin are you using to sense voltage?
-#define voltSensorPin = 4;
+int voltSensorPin = 4;
 
 //What pin are you using to sense amperage?
 int ampSensorPin = 5;
