@@ -434,7 +434,7 @@ void setup() {
           resetMessage = 1;
         }
         
-        else if  (resetMessage == 0 ) {
+        else if  (resetMessage == 1 ) {
         
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest3;
@@ -443,7 +443,7 @@ void setup() {
           resetMessage = 2;
         }
 
-        else if  (resetMessage == 0 ) {
+        else if  (resetMessage == 2 ) {
           
           lcdSerial.write(128);               // line 0 pos 0 
           lcdSerial << rest5;
