@@ -393,6 +393,8 @@ void setup() {
   if ( digitalRead( defaultPin ) == LOW ) { 
     
     Serial.println("Default button pressed");
+      
+    unsigned long previousMillisSensor = 0;
 
     lcdSerial.write(12);                // Clear 
 
@@ -406,8 +408,7 @@ void setup() {
     
     
     while(foovar < 200){
-
-      unsigned long previousMillisSensor = 0;
+      
       unsigned long currentMillis = millis();
 
       if(currentMillis - previousMillisSensor > 1000) {
