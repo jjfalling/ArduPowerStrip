@@ -59,7 +59,7 @@ const boolean relayType = 0;
 const int outlets[] = {A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
-#define rebootDelay = 3000
+#define rebootDelay 3000
 
 //How long before the telnet session times out(in milliseconds)?
 #define telnetTimeout 300000
