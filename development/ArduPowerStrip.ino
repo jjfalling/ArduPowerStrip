@@ -407,7 +407,7 @@ void setup() {
     
     while(foovar < 200){
 
-      unsigned long previousMillisSensor = millis();
+      unsigned long previousMillisSensor = 0;
       unsigned long currentMillis = millis();
 
       if(currentMillis - previousMillisSensor > 1000) {
