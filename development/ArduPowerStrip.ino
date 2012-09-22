@@ -850,7 +850,6 @@ void command_info(String args) {
   // this command spits out the info messages
 
   client->println();
-
   eclient << info_string;
   client->println();
   eclient << info1;
