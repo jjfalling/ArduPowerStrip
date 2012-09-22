@@ -425,6 +425,9 @@ void setup() {
       // read the current state of the button
       buttonState = digitalRead(lcdButtonPin);
 
+      if (buttonState == HIGH) {
+        
+      }
 
       if(currentMillis - previousMillisSensor > 2400) {
         previousMillisSensor = millis();
