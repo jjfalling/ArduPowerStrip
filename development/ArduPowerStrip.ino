@@ -160,7 +160,7 @@ long previousMillis = 0;        // will store last time LED was updated
 long interval = 700;           // interval at which to blink (milliseconds)
 
 
-int buttonState = 0;         // current state of the button
+int lcdButtonState = 0;         // current state of the button
 long previousMillisLCD = 0;
 boolean backlight = true;     // variable for reading the pin status
 
@@ -423,9 +423,9 @@ void setup() {
       unsigned long currentMillis = millis();
 
       // read the current state of the button
-      buttonState = digitalRead(lcdButtonPin);
+      lcdButtonState = digitalRead(lcdButtonPin);
 
-      if (buttonState == HIGH) {
+      if (lcdButtonState == HIGH) {
         
       }
 
@@ -1108,27 +1108,27 @@ void controlLCDBacklight() {
 
 
   // read the current state of the button
-  buttonState = digitalRead(lcdButtonPin);
+  lcdButtonState = digitalRead(lcdButtonPin);
 
   // if the button was pushed and the backlight is off, turn the light on
-  if (buttonState == HIGH && backlight == false) {
+  if (lcdButtonState == HIGH && backlight == false) {
     backlight = 1;
     lcdSerial.write(17);
 
     //keep screen from flickering 
-    while (buttonState == HIGH){
-      buttonState = digitalRead(lcdButtonPin);
+    while (lcdButtonState == HIGH){
+      lcdButtonState = digitalRead(lcdButtonPin);
     }
   } 
 
   // if the button was pushed and the backlight is on, turn the light off
-  else if (buttonState == HIGH && backlight == true) {
+  else if (lcdButtonState == HIGH && backlight == true) {
     backlight = false;
     lcdSerial.write(18);
 
     //keep screen from flickering 
-    while (buttonState == HIGH){
-      buttonState = digitalRead(lcdButtonPin);
+    while (lcdButtonState == HIGH){
+      lcdButtonState = digitalRead(lcdButtonPin);
     }
   }
 
