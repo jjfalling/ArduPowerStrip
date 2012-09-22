@@ -15,14 +15,14 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -enable telent session timeout
  -allow only one session
  -on/off/reboot/status all
- -change network/hostname over telnet? move said settings to flash. 
  -remove debug option for serial
  -various items commented as fix
  -add snmp support
- -up/down arrows
+ -up/down arrows/history?
+ -snmp support -v5
+ -change network/hostname over telnet? move said settings to flash. -v4/v5
  
- -add volt reporting (with option of using lcd display) - v3
-
+ -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc) - v4
  
  */
 
@@ -44,36 +44,40 @@ byte gateway[] = {
 byte subnet[] = { 
   255, 255, 255, 0 };
 
+
 //Hostname
 const char hostname[] = "APS-rpc1";
 
 //You need to define the type of relay you are using or how you have it wired. Some relays
 // are off when set to low while others are on while set to low. You many need to play with this.
 // To try an make this more simple, here is a guide for if your relay is set to NO or NC:
-//NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high | 0 is off=pin low
-const boolean relayType = 1;    
+//NC: 1 is off=pin low, 0 is off=pin high  | NO: 1 is off=pin high, 0 is off=pin low
+const boolean relayType = 0;    
 
 //What digital pins are your outlets attached to (outlet1 is the first pin listed, outlet2 is the second pin, etc)?
-const int outlets[] = { 
-  A0,A1,A2,A3};
+const int outlets[] = {
+  A0,A1,A2};
 
 //How long should the delay between off and on during a reboot be (in milliseconds)?
-const int rebootDelay = 3000; 
+#define rebootDelay 3000
 
 //How long before the telnet session times out(in milliseconds)?
-const long telnetTimeout = 300000;
+#define telnetTimeout 300000
 
 //What pin is the statusLED connected to?
-const int statusLED =  2;
+#define statusLED 2
 
 // What pin is the lcd backlight button connected to?
-const int  buttonPin = 3;
+#define buttonPin 3
 
 //What pin is the lcd serial pin connected to?
-const int lcdTxPin = 5;
+#define lcdTxPin 5
+
+//What pin is the "factory default" button connected to?
+#define defaultPin 6
 
 //How long should the lcd be on before it turns its self off (in ms) [Set to 0 to disable]? 
-const long lcdTimeout = 600000 ;
+#define lcdTimeout 600000
 
 //What pin is the internal humid/temp (dht11) sensor on?
 #define intDHT11 7
@@ -88,10 +92,10 @@ const long lcdTimeout = 600000 ;
 boolean tempF = true;
 
 //What pin are you using to sense voltage?
-int voltSensorPin = 4;
+#define voltSensorPin 4
 
 //What pin are you using to sense amperage?
-int ampSensorPin = 5;
+#define ampSensorPin 5
 
 //FIX rm this: Enable serial debug? 
 boolean debug = true;
@@ -115,17 +119,21 @@ boolean debug = true;
 #include <dht11.h>
 #include <EmonLib.h>
 
- // Create an instance
-EnergyMonitor emon1;                  
-
-//tell the dht lib we are using a DHT11
-dht11 DHT11;
-
-SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
 
 //program name and version
 #define _NAME "ArduPowerStrip"
-#define _VERSION "0.3"
+#define _VERSION "0.4"
+
+
+
+// Create an instance
+EnergyMonitor emon1;                  
+
+//Define the dht instance (I think?)
+dht11 DHT11;
+
+//define software serial for the lcd
+SoftwareSerial lcdSerial = SoftwareSerial(255, lcdTxPin);
 
 //disable watchdog, this is needed on newer chips to prevent a reboot loop. However I can't test this...
 void wdt_init(void)
@@ -219,7 +227,7 @@ FLASH_STRING(error_5,"ERR: Syntax error please use a valid command\n");
 FLASH_STRING(set1,"Setting outlet ");
 FLASH_STRING(set2," to ");
 FLASH_STRING(off1,"OFF\n");
-FLASH_STRING(on1,"OFF\n");
+FLASH_STRING(on1,"ON\n");
 FLASH_STRING(reboot1,"Rebooting outlet ");
 FLASH_STRING(reboot2,", please wait about ");
 FLASH_STRING(reboot3," ms.\n");
@@ -251,14 +259,14 @@ FLASH_STRING(exit1,"Closing connection. Goodbye...\n");
 FLASH_STRING(connect1,"\n\nAnother user is already connected.");
 FLASH_STRING(connect2,"\nOnly one user can connect at a time.\nClosing connection. Goodbye...\n\n");
 FLASH_STRING(connect3,"Second user tried to connect");
-FLASH_STRING(lcd1,"Volts:     ");
-FLASH_STRING(lcd2,"Amps:       ");
-FLASH_STRING(lcd3,"Humid1:     ");
-FLASH_STRING(lcd4,"Humid2:     ");
-FLASH_STRING(lcd5,"Humid3:     ");
-FLASH_STRING(lcd6,"Temp1:     ");
-FLASH_STRING(lcd7,"Temp2:     ");
-FLASH_STRING(lcd8,"Temp3:     ");
+FLASH_STRING(lcd1,"Volts:    ");
+FLASH_STRING(lcd2,"Amps:      ");
+FLASH_STRING(lcd3,"Humid I:    ");
+FLASH_STRING(lcd4,"Humid E1:   ");
+FLASH_STRING(lcd5,"Humid E2:   ");
+FLASH_STRING(lcd6,"Temp I:    ");
+FLASH_STRING(lcd7,"Temp E1:   ");
+FLASH_STRING(lcd8,"Temp E2:   ");
 FLASH_STRING(lcd9,"     Uptime:");
 
 double Irms;
@@ -313,21 +321,21 @@ void setup() {
 
 
   com[0]=(Command){
-    "HELP", "Prints this. Try HELP <CMD> for more", command_help};
+    "HELP", "Prints this. Try HELP <CMD> for more", command_help  };
   com[1]=(Command){
-    "INFO", "Shows system information", command_info};
+    "INFO", "Shows system information", command_info  };
   com[2]=(Command){
-    "STATUS", "Shows the status of a outlet", command_status};
+    "STATUS", "Shows the status of a outlet", command_status  };
   com[3]=(Command){
-    "ON", "Sets an outlet to on", command_on};
+    "ON", "Sets an outlet to on", command_on  };
   com[4]=(Command){
-    "OFF", "Sets an outlet to off", command_off};
+    "OFF", "Sets an outlet to off", command_off  };
   com[5]=(Command){
-    "REBOOT", "Reboots an outlet", command_reboot};
+    "REBOOT", "Reboots an outlet", command_reboot  };
   com[6]=(Command){
-    "QUIT", "Quits this session gracefully", command_quit};
+    "QUIT", "Quits this session gracefully", command_quit  };
   com[7]=(Command){
-    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset};
+    "RESET", "Preform a software reset on this device (and resets ALL relays!)", command_reset  };
   //com[8]=(Command){"SET", "Set system params (maybe?)", command_set};
 
   pinMode(statusLED, OUTPUT);
@@ -366,7 +374,8 @@ void setup() {
   lcdSerial.write(_VERSION); 
 
 
-  //update voltage and amperage data
+  //FIX make the rest of this vars
+  //update voltage and amperage data 
   emon1.voltage(voltSensorPin, 120, 1.7);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, 29);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm  
 
@@ -426,6 +435,7 @@ void loop() {
         }
       }
 
+
       //Blink status led while there is an active telnet session
       //This is from http://arduino.cc/en/Tutorial/BlinkWithoutDelay 
       unsigned long currentMillis = millis();
@@ -442,13 +452,21 @@ void loop() {
       }
 
 
-      //following functions are so the backlight and sensors continue to work while a session is active
       //control lcd backlight
       controlLCDBacklight();
+
       //update sensors
       updateSensors();
+
       //write data to lcd
       writeLCD();
+
+      //FIX: calculating the power causes the prompt to freeze for about 2 seconds...
+
+      //update power usage
+      Irms = emon1.calcIrms(1480);  // Calculate Irms only
+      Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+
 
     }
 
@@ -484,7 +502,8 @@ void loop() {
 
   //update power usage
   Irms = emon1.calcIrms(1480);  // Calculate Irms only
- // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+  Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+
 
 }
 
@@ -834,8 +853,7 @@ void command_help(String args) {
 void command_info(String args) {
   // this command spits out the info messages
 
-    client->println();
-
+  client->println();
   eclient << info_string;
   client->println();
   eclient << info1;
@@ -1042,7 +1060,7 @@ void writeLCD() {
       delay(5);                            // Required delay
       lcdSerial.write(128);      // line 0 pos 0
       lcdSerial << lcd1;
-      lcdSerial.print("000.0"); 
+      lcdSerial.print(Vrms); 
       lcdSerial.write(148);      // line 1 pos 0
       lcdSerial << lcd2;  
       lcdSerial.print(Irms);
@@ -1132,11 +1150,32 @@ void writeLCD() {
       lcdSerial.write(dtostrf(days,2,0,dtostrfbuffer1)); //max uptime is about 50 days, so dont do more then 2 chars
       lcdSerial.write("Days ");
 
-      lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
+      //if hours < 10 then prepend 0
+      if (hours < 10 ) {
+        lcdSerial.write("0");
+        lcdSerial.write(dtostrf(hours,1,0,dtostrfbuffer1));
+      }
+      else {
+        lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
+      }
       lcdSerial.write(":");
-      lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
+      //if mins < 10 then prepend 0
+      if (mins < 10 ) {
+        lcdSerial.write("0");
+        lcdSerial.write(dtostrf(mins,1,0,dtostrfbuffer1));
+      }
+      else {
+        lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
+      }
       lcdSerial.write(":");
-      lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
+      //if secs < 10 then prepend 0
+      if (secs < 10 ) {
+        lcdSerial.write("0");
+        lcdSerial.write(dtostrf(secs,1,0,dtostrfbuffer1));
+      }
+      else {
+        lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
+      }
 
       //since this is the last screen, reset the counter to start over
       lcdCounter=0;
@@ -1177,11 +1216,7 @@ void updateSensors() {
       previousMillisSensor = millis();
 
     }
-
   }
-
-
-
 }
 
 
@@ -1258,21 +1293,27 @@ void validatePin(int pin, String args){
     eclient << error_1;
     print_prompt();
     validateError=true;
+    return;
   }	
 
   if (args.length() > 2) {
     eclient << error_2;
     print_prompt();
     validateError=true;
+    return;
   }
 
   if (pin > numOfOutlets || pin < 1) {
     eclient << error_3;
     print_prompt();
     validateError=true;
+    return;
   }
 
 }
+
+
+
 
 
 
