@@ -429,23 +429,23 @@ void setup() {
 
         case 0:
           lcdSerial.write(128);               // line 0 pos 0 
-          lcdSerial.write("Default? press");   // Turn backlight on
+          lcdSerial << rest1;
           lcdSerial.write(148);               // line 1 pos 0
-          lcdSerial.write("LCD button to");  // Turn backlight on
+          lcdSerial << rest2;
           resetMessage = 1;
 
         case 1:
           lcdSerial.write(128);               // line 0 pos 0 
-          lcdSerial.write("default settings");   // Turn backlight on
+          lcdSerial << rest3;
           lcdSerial.write(148);               // line 1 pos 0
-          lcdSerial.write("or reset device");  // Turn backlight on
+          lcdSerial << rest4;
           resetMessage = 2;
 
         case 2:
           lcdSerial.write(128);               // line 0 pos 0 
-          lcdSerial.write("to cancel and");   // Turn backlight on
+          lcdSerial << rest6;
           lcdSerial.write(148);               // line 1 pos 0
-          lcdSerial.write("boot normally");  // Turn backlight on
+          lcdSerial << rest7;
           resetMessage = 0;
 
         }
