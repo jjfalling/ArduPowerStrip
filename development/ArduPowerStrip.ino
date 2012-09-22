@@ -426,7 +426,11 @@ void setup() {
       lcdButtonState = digitalRead(lcdButtonPin);
 
       if (lcdButtonState == HIGH) {
-        
+          lcdSerial.write(12);                // Clear 
+          lcdSerial.write(128);               // line 0 pos 0 
+          lcdSerial << rest7;
+          lcdSerial.write(148);               // line 1 pos 0
+          lcdSerial << rest8;
       }
 
       if(currentMillis - previousMillisSensor > 2400) {
