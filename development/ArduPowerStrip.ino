@@ -543,6 +543,7 @@ void process_command(String* command) {
 }
 
 
+
 int command_item(String cmd_code) {
   // this method does all of the comparison stuff to determine the id of a command
   // which it then passes back
@@ -566,6 +567,7 @@ int command_item(String cmd_code) {
   }
 
 }
+
 
 
 void command_status(String args) {
@@ -647,6 +649,7 @@ void command_status(String args) {
 }
 
 
+
 void command_on(String args) {
 
   // argument passed in should simply be a number and it's that one we read.
@@ -677,6 +680,7 @@ void command_on(String args) {
     print_prompt();
   }
 }
+
 
 
 void command_off(String args) {
@@ -710,6 +714,7 @@ void command_off(String args) {
 }
 
 
+
 void command_reboot(String args) {
 
   // argument passed in should simply be a number and it's that one we read.
@@ -737,6 +742,7 @@ void command_reboot(String args) {
     print_prompt();
   }
 }
+
 
 
 void set_outlet(int pin, int power_req) {
@@ -805,11 +811,13 @@ void set_outlet(int pin, int power_req) {
 }
 
 
+
 //to save a bit of memory, making this into a function
 void print_prompt() {
   client->println();
   client->print("> ");
 }
+
 
 
 //user requests help
@@ -855,6 +863,7 @@ void command_help(String args) {
     print_prompt();
   }
 }
+
 
 
 //user requests info
@@ -958,6 +967,7 @@ void command_info(String args) {
 }
 
 
+
 //user requests quit
 void command_quit(String args) {
   // this method closes down the network connection.
@@ -966,6 +976,7 @@ void command_quit(String args) {
   client->println();
   ethcl->stop();
 }
+
 
 
 //user wanted to reset controller
