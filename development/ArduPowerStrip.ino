@@ -281,6 +281,8 @@ FLASH_STRING(lcd9,"     Uptime:");
 double Irms;
 double Vrms;
 
+
+
 //end of global section
 //########################## 
 
@@ -290,6 +292,13 @@ void setup() {
   Serial.begin(9600);
   client = &Serial;
   if (debug) Serial << boot1;
+  
+  
+   pinMode(default, INPUT_PULLUP); 
+  
+  
+  
+ 
 
   //set the pin modes 
   int x;
