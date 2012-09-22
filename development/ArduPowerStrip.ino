@@ -15,12 +15,12 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -enable telent session timeout
  -allow only one session
  -on/off/reboot/status all
- -change network/hostname over telnet? move said settings to flash. 
  -remove debug option for serial
  -various items commented as fix
  -add snmp support
  -up/down arrows/history?
- -snmp support -5
+ -snmp support -v5
+ -change network/hostname over telnet? move said settings to flash. -v4/v5
  
  -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc) - v4
  
