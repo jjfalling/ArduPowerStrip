@@ -118,9 +118,12 @@ boolean debug = true;
 #include <dht11.h>
 #include <EmonLib.h>
 
+
 //program name and version
 #define _NAME "ArduPowerStrip"
 #define _VERSION "0.4"
+
+
 
 // Create an instance
 EnergyMonitor emon1;                  
