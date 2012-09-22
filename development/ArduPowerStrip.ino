@@ -107,7 +107,7 @@ boolean tempF = true;
 #define ampCalibration 5
 
 //FIX rm this: Enable serial debug? 
-boolean debug = true;
+#define debug = true;
 
 
 //################## 
