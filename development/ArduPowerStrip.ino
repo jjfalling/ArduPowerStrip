@@ -393,8 +393,8 @@ void setup() {
   if ( digitalRead( defaultPin ) == LOW ) { 
 
     lcdSerial.write(12);                 // Clear    
-    lcdSerial.write("Reset? Press LCD bttn");                 // Turn backlight on
-    lcdSerial.write("or reset to cancel");                 // Turn backlight on
+    lcdSerial.write("Reset? hold reset");                 // Turn backlight on
+    lcdSerial.write("or rls to cancel");                 // Turn backlight on
     
   }
   
