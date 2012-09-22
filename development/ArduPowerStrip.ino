@@ -422,7 +422,7 @@ void setup() {
       
       unsigned long currentMillis = millis();
 
-      if(currentMillis - previousMillisSensor > 2000) {
+      if(currentMillis - previousMillisSensor > 2400) {
         previousMillisSensor = millis();
 
         if (resetMessage == 0) {
