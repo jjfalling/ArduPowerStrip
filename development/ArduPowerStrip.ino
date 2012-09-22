@@ -291,14 +291,7 @@ void setup() {
 
   Serial.begin(9600);
   client = &Serial;
-  if (debug) Serial << boot1;
-  
-  
-   pinMode(defaultPin, INPUT_PULLUP); 
-  
-  
-  
- 
+  if (debug) Serial << boot1; 
 
   //set the pin modes 
   int x;
@@ -391,6 +384,20 @@ void setup() {
   lcdSerial.write(148);            // line 1 pos 0
   lcdSerial.write("       ");      //as the version changes, the padding may need adjusting
   lcdSerial.write(_VERSION); 
+
+
+
+  pinMode(defaultPin, INPUT_PULLUP); 
+  
+  // if the resetSwitch is LOW restore password and tcp parameters todefaul values
+  if ( digitalRead( defaultPin ) == LOW ) { 
+
+    lcdSerial.write(12);                 // Clear    
+    lcdSerial.write("reset?");                 // Turn backlight on
+    
+  }
+  
+
 
 
   //update voltage and amperage data 
