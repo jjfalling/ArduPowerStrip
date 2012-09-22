@@ -21,8 +21,6 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  -add snmp support
  -up/down arrows
  
- -add volt reporting (with option of using lcd display) - v3
- 
  -free up memory by making as many globals local as possible (voltage, amps, temp/humid, etc)
  
  */
@@ -1150,8 +1148,16 @@ void writeLCD() {
 
       lcdSerial.write(dtostrf(hours,2,0,dtostrfbuffer1));
       lcdSerial.write(":");
+      //if mins < 10 then prepend 0
+      if ( (mins < 10 ) {
+        lcdSerial.write("0");
+      }
       lcdSerial.write(dtostrf(mins,2,0,dtostrfbuffer1));
       lcdSerial.write(":");
+      //if secs < 10 then prepend 0
+      if ( (secs < 10 ) {
+        lcdSerial.write("0");
+      }
       lcdSerial.write(dtostrf(secs,2,0,dtostrfbuffer1));
 
       //since this is the last screen, reset the counter to start over
