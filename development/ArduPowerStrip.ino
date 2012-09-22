@@ -392,10 +392,16 @@ void setup() {
   // if the resetSwitch is LOW restore password and tcp parameters todefaul values
   if ( digitalRead( defaultPin ) == LOW ) { 
 
-    lcdSerial.write(12);                 // Clear    
-    lcdSerial.write("Reset? hld reset");                 // Turn backlight on
-    lcdSerial.write("or rls to cncl");                 // Turn backlight on
-    
+    lcdSerial.write(12);                // Clear 
+ 
+    lcdSerial.write(128);               // line 0 pos 0 
+    lcdSerial.write("Default? press");   // Turn backlight on
+    lcdSerial.write(148);               // line 1 pos 0
+    lcdSerial.write("LCD button to");  // Turn backlight on
+    lcdSerial.write(128);               // line 0 pos 0 
+    lcdSerial.write("default settings");   // Turn backlight on
+    lcdSerial.write(148);               // line 1 pos 0
+    lcdSerial.write("or rst to cncl");  // Turn backlight on
   }
   
 
