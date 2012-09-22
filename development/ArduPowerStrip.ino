@@ -1006,6 +1006,8 @@ int memoryTest() {
 }
 
 
+
+//this controls the lcd backlight
 void controlLCDBacklight() {
 
 
