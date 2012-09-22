@@ -1190,7 +1190,6 @@ void writeLCD() {
       previousMillisLCDT = millis();
 
     }
-
   }
 }
 
@@ -1317,7 +1316,6 @@ void validatePin(int pin, String args){
     validateError=true;
     return;
   }
-
 }
 
 
