@@ -287,7 +287,7 @@ FLASH_STRING(rest6,"boot normally");
 FLASH_STRING(rest7,"Defaulting all");
 FLASH_STRING(rest8,"settings...");
 FLASH_STRING(rest9,"Default button pressed");
-FLASH_STRING(rest10,"settings...");
+FLASH_STRING(rest10,"User is defaulting the device");
 
 double Irms;
 double Vrms;
