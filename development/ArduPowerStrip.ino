@@ -277,7 +277,6 @@ FLASH_STRING(lcd6,"Temp I:    ");
 FLASH_STRING(lcd7,"Temp E1:   ");
 FLASH_STRING(lcd8,"Temp E2:   ");
 FLASH_STRING(lcd9,"     Uptime:");
-
 FLASH_STRING(rest1,"Default? Press");
 FLASH_STRING(rest2,"LCD button to");
 FLASH_STRING(rest3,"default settings");
