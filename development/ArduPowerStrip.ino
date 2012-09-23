@@ -286,6 +286,8 @@ FLASH_STRING(rest5,"to cancel and");
 FLASH_STRING(rest6,"boot normally");
 FLASH_STRING(rest7,"Defaulting all");
 FLASH_STRING(rest8,"settings...");
+FLASH_STRING(rest9,"Default button pressed");
+FLASH_STRING(rest10,"settings...");
 
 double Irms;
 double Vrms;
