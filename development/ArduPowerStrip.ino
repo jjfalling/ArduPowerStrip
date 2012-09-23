@@ -561,8 +561,8 @@ void loop() {
       //FIX: calculating the power causes the prompt to freeze for about 2 seconds...
 
       //update power usage
-//      Irms = emon1.calcIrms(1480);  // Calculate Irms only
-//      Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+      Irms = emon1.calcIrms(1480);  // Calculate Irms only
+      Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 
     }
