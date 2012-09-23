@@ -286,8 +286,8 @@ FLASH_STRING(rest5,"to cancel and");
 FLASH_STRING(rest6,"boot normally");
 FLASH_STRING(rest7,"Defaulting all");
 FLASH_STRING(rest8,"settings...");
-FLASH_STRING(rest9,"Default button pressed");
-FLASH_STRING(rest10,"User is defaulting the device");
+FLASH_STRING(rest9,"Default button pressed\n");
+FLASH_STRING(rest10,"User is defaulting the device\n");
 
 double Irms;
 double Vrms;
@@ -397,7 +397,7 @@ void setup() {
 
     delay(1000);
 
-    Serial.println("Default button pressed");
+    Serial << rest9;
 
     unsigned long previousMillisSensor = 0;
 
@@ -420,7 +420,7 @@ void setup() {
       lcdButtonState = digitalRead(lcdButtonPin);
 
       if (lcdButtonState == HIGH) {
-        Serial.println("User is defaulting the device");
+        Serial << rest10;
         lcdSerial.write(12);                // Clear 
         lcdSerial.write(128);               // line 0 pos 0 
         lcdSerial << rest7;
