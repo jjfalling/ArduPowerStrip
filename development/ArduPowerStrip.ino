@@ -558,7 +558,7 @@ void loop() {
       //write data to lcd
       writeLCD();
 
-      //FIX: calculating the power causes the prompt to freeze for about 2 seconds...
+      //FIX: calculating the power causes the prompt to freeze for about 4 seconds...
 
       //update power usage
       Irms = emon1.calcIrms(1480);  // Calculate Irms only
