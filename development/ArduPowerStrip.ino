@@ -465,9 +465,7 @@ void setup() {
           lcdSerial << rest6;
           resetMessage = 0;
         }
-
       }
-
     }
   }
 
