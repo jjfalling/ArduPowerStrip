@@ -471,7 +471,7 @@ void setup() {
 
 
 
-  //update voltage and amperage data 
+  //update voltage and amperage data before starting main loop
   emon1.voltage(voltSensorPin, acVoltage, voltphaseShift);  // Voltage: input pin, calibration, phase_shift
   emon1.current(ampSensorPin, ampCalibration);       // Current: input pin, calibration. calibration const= 1800/62. CT SCT-013-030 ratio=1800, RL 62ohm 
 
@@ -549,6 +549,8 @@ void loop() {
       }
 
 
+
+     //FIX: maybe turn this into an interupt?
       //control lcd backlight
       controlLCDBacklight();
 
@@ -561,8 +563,8 @@ void loop() {
       //FIX: calculating the power causes the prompt to freeze for about 4 seconds...
 
       //update power usage
-      Irms = emon1.calcIrms(1480);  // Calculate Irms only
-      Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
+     // Irms = emon1.calcIrms(1480);  // Calculate Irms only
+     // Vrms = emon1.calcVrms(1480); // Calculate Vrms only   
 
 
     }
