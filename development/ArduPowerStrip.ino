@@ -8,7 +8,7 @@ ARDUPOWERSTRIP - JJFALLING ©2012
  Also where I found the split library
  Flash library found here: http://arduiniana.org/libraries/flash/
  Got EmonLib from here: http://openenergymonitor.org
- 
+ Got Agentuino from: http://code.google.com/p/agentuino/source/browse/#svn%2Ftrunk%2FAgentuino
  Also modified EmonLib using http://roysoala.wordpress.com/2012/04/20/energy-monitoring-using-pachube-and-arduino-1-0/
  
  TODO:
