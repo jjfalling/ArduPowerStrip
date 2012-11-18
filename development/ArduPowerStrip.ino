@@ -127,7 +127,7 @@ const int outlets[] = {
 #include <SoftwareSerial.h>
 #include <dht11.h>
 #include <EmonLib.h>
-
+#include <Agentuino.h> 
 
 //program name and version
 #define _NAME "ArduPowerStrip"
