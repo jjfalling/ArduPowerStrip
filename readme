@@ -1,6 +1,8 @@
 ArduPowerStrip
 ==============
 
+NOTE: After getting a mega 2560 I found this program uses atleast 2.6k of memory. The uno only has 2k. Hopefully I will fix this in the future....
+
 This was developed on a Arduino Uno board, an R3 ethernet sheild, and the 1.0.x branch of the Arduino IDE.
 
 
